@@ -1,4 +1,4 @@
-// import 
+import { Vector2 } from "./GameData/CommonData";
 
 export default class MainGame extends Laya.Script {
   /** @prop {name:GameMeshWidth, tips:"网格总宽度", type:Int, default:7}*/
@@ -45,8 +45,7 @@ export default class MainGame extends Laya.Script {
     }
   }
 
-  onEnable(): void {
-  }
+  onEnable(): void {}
 
   onDisable(): void {}
 }
