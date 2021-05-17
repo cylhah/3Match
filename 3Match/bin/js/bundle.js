@@ -26,7 +26,6 @@
               let positionOffset = new Vector2(this.GameBoxItemSize.x * gameMeshX, this.GameBoxItemSize.y * gameMeshY);
               let positionX = this.GameMeshStartPosition.x + positionOffset.x;
               let positionY = this.GameMeshStartPosition.y - positionOffset.y;
-              console.log(positionX, positionY);
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
               box.pos(positionX, positionY);
               this.gameBoard.addChild(box);
