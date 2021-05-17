@@ -1,31 +1,38 @@
 (function () {
   'use strict';
 
+  class Vector2 {
+      constructor(nx, ny) {
+          this.x = nx;
+          this.y = ny;
+      }
+  }
+
   class MainGame extends Laya.Script {
       constructor() {
           super();
           this.GameMeshWidth = 7;
           this.GameMeshHeight = 8;
           this.InitialGameMeshHeight = 2;
-          this.GameBoxItemSize = new Laya.Vector2(84, 84);
-          this.GameMeshStartPosition = new Laya.Vector2(0, 588);
+          this.GameBoxItemSize = new Vector2(84, 84);
+          this.GameMeshStartPosition = new Vector2(0, 588);
       }
       onAwake() {
-          this.gameBoard = this.owner.getChildByName("GameBoard");
+          this.gameBoard = (this.owner.getChildByName("GameBackground").getChildByName("GameBoard"));
           let InitialGameCount = this.InitialGameMeshHeight * this.GameMeshWidth;
           for (let i = 0; i < InitialGameCount; i++) {
               let gameMeshX = i % this.GameMeshWidth;
-              let gameMeshY = i / this.GameMeshWidth;
-              let positionOffset = new Laya.Vector2(this.GameBoxItemSize.x * gameMeshX, this.GameBoxItemSize.y * gameMeshY);
+              let gameMeshY = Math.floor(i / this.GameMeshWidth);
+              let positionOffset = new Vector2(this.GameBoxItemSize.x * gameMeshX, this.GameBoxItemSize.y * gameMeshY);
               let positionX = this.GameMeshStartPosition.x + positionOffset.x;
-              let positionY = this.GameMeshStartPosition.y + positionOffset.y;
+              let positionY = this.GameMeshStartPosition.y - positionOffset.y;
+              console.log(positionX, positionY);
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
               box.pos(positionX, positionY);
               this.gameBoard.addChild(box);
           }
       }
-      onEnable() {
-      }
+      onEnable() { }
       onDisable() { }
   }
 

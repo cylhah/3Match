@@ -2,11 +2,12 @@
     "x":0,
     "type":"Scene",
     "selectedBox":1,
+    "selecteID":21,
     "searchKey":"Scene,gameBox",
     "referenceLines":null,
     "props":{"width":640,"sceneColor":"#000000","runtime":"script/GameUI.ts","name":"gameBox","height":1136},
     "nodeParent":-1,
-    "maxID":21,
+    "maxID":22,
     "label":"gameBox",
     "isOpen":true,
     "isDirectory":true,
@@ -29,7 +30,9 @@
             "child":[
                 {
                     "type":"BoxCollider",
+                    "switchAble":true,
                     "searchKey":"BoxCollider",
+                    "removeAble":true,
                     "props":{"y":0,"x":0,"width":805,"label":"ground","height":20},
                     "nodeParent":3,
                     "label":"BoxCollider",
@@ -42,7 +45,9 @@
                 },
                 {
                     "type":"RigidBody",
+                    "switchAble":true,
                     "searchKey":"RigidBody",
+                    "removeAble":true,
                     "props":{"type":"static"},
                     "nodeParent":3,
                     "label":"RigidBody",
@@ -65,6 +70,20 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":18,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Sprite",
+            "searchKey":"Sprite",
+            "props":{"y":356,"x":140,"texture":"image/7d3902a0-12ea-4716-9241-85f5648f2c41.png"},
+            "nodeParent":1,
+            "label":"Sprite",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":21,
             "child":[
                 ]
         },
@@ -117,7 +136,7 @@
             "source":"src/script/GameControl.ts",
             "searchKey":"Script,GameControl",
             "removeAble":true,
-            "props":{"enabled":true,"dropBox":"@Prefab:prefab/DropBox.prefab","bullet":"@Prefab:prefab/Bullet.prefab"},
+            "props":{"enabled":false,"dropBox":"@Prefab:prefab/DropBox.prefab","bullet":"@Prefab:prefab/Bullet.prefab"},
             "nodeParent":1,
             "label":"GameControl",
             "isDirectory":false,
