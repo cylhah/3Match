@@ -1,12 +1,12 @@
 {
     "x":0,
     "type":"Scene",
-    "selectedBox":3,
-    "selecteID":13,
+    "selectedBox":2,
+    "selecteID":4,
     "searchKey":"Scene",
     "props":{"width":720,"sceneColor":"#000000","height":1280},
     "nodeParent":-1,
-    "maxID":18,
+    "maxID":24,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -34,40 +34,13 @@
                     "props":{"y":327,"x":66,"width":588,"texture":"test/block.png","name":"GameBoard","height":672},
                     "nodeParent":3,
                     "label":"GameBoard",
-                    "isOpen":false,
-                    "isDirectory":true,
+                    "isOpen":true,
+                    "isDirectory":false,
                     "isAniNode":true,
-                    "hasChild":true,
+                    "hasChild":false,
                     "compId":4,
                     "child":[
-                        {
-                            "type":"Sprite",
-                            "searchKey":"Sprite",
-                            "props":{"y":588,"x":0,"presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab"},
-                            "nodeParent":4,
-                            "label":"BoxItem",
-                            "isOpen":true,
-                            "isDirectory":false,
-                            "isAniNode":true,
-                            "hasChild":false,
-                            "compId":5,
-                            "child":[
-                                ]
-                        },
-                        {
-                            "type":"Sprite",
-                            "searchKey":"Sprite",
-                            "props":{"y":588,"x":84,"visible":true,"presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab"},
-                            "nodeParent":4,
-                            "label":"BoxItem",
-                            "isOpen":true,
-                            "isDirectory":false,
-                            "isAniNode":true,
-                            "hasChild":false,
-                            "compId":9,
-                            "child":[
-                                ]
-                        }]
+                        ]
                 },
                 {
                     "x":30,
@@ -77,74 +50,104 @@
                     "nodeParent":3,
                     "label":"ClickContainer",
                     "isOpen":true,
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":13,
+                    "child":[
+                        ],
+                    "$LOCKED":false,
+                    "$HIDDEN":true
+                },
+                {
+                    "x":30,
+                    "type":"Sprite",
+                    "searchKey":"Sprite",
+                    "props":{"y":243,"x":318,"presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab"},
+                    "nodeParent":3,
+                    "label":"BoxItem",
+                    "isOpen":null,
                     "isDirectory":true,
                     "isAniNode":true,
                     "hasChild":true,
-                    "compId":13,
+                    "compId":18,
                     "child":[
                         {
-                            "x":45,
-                            "type":"Sprite",
-                            "searchKey":"Sprite",
-                            "props":{"x":66,"presetID":1,"preset":"laya/pages/prefab/ClickBox.prefab"},
-                            "nodeParent":13,
-                            "label":"ClickBox",
-                            "isOpen":false,
-                            "isDirectory":true,
+                            "type":"RigidBody",
+                            "switchAble":true,
+                            "searchKey":"RigidBody",
+                            "removeAble":true,
+                            "props":{"presetID":2,"preset":"laya/pages/prefab/BoxItem.prefab"},
+                            "nodeParent":18,
+                            "label":"RigidBody(BoxItem)",
+                            "isDirectory":false,
                             "isAniNode":true,
-                            "hasChild":true,
-                            "compId":12,
+                            "hasChild":false,
+                            "compId":19,
                             "child":[
-                                {
-                                    "type":"Script",
-                                    "switchAble":true,
-                                    "source":"src/script/ClickBox.ts",
-                                    "searchKey":"Script,ClickBox",
-                                    "removeAble":true,
-                                    "props":{"presetID":2,"preset":"laya/pages/prefab/ClickBox.prefab"},
-                                    "nodeParent":12,
-                                    "label":"ClickBox",
-                                    "isDirectory":false,
-                                    "isAniNode":true,
-                                    "hasChild":false,
-                                    "compId":15,
-                                    "child":[
-                                        ]
-                                }],
-                            "$HIDDEN":true
+                                ]
                         },
                         {
-                            "x":45,
-                            "type":"Sprite",
-                            "searchKey":"Sprite",
-                            "props":{"y":0,"x":150,"presetID":1,"preset":"laya/pages/prefab/ClickBox.prefab"},
-                            "nodeParent":13,
-                            "label":"ClickBox",
-                            "isOpen":false,
-                            "isDirectory":true,
+                            "type":"BoxCollider",
+                            "switchAble":true,
+                            "searchKey":"BoxCollider",
+                            "removeAble":true,
+                            "props":{"presetID":3,"preset":"laya/pages/prefab/BoxItem.prefab"},
+                            "nodeParent":18,
+                            "label":"BoxCollider(BoxItem)",
+                            "isDirectory":false,
                             "isAniNode":true,
-                            "hasChild":true,
-                            "compId":16,
+                            "hasChild":false,
+                            "compId":23,
                             "child":[
-                                {
-                                    "type":"Script",
-                                    "switchAble":true,
-                                    "source":"src/script/ClickBox.ts",
-                                    "searchKey":"Script,ClickBox",
-                                    "removeAble":true,
-                                    "props":{"presetID":2,"preset":"laya/pages/prefab/ClickBox.prefab"},
-                                    "nodeParent":16,
-                                    "label":"ClickBox",
-                                    "isDirectory":false,
-                                    "isAniNode":true,
-                                    "hasChild":false,
-                                    "compId":17,
-                                    "child":[
-                                        ]
-                                }],
-                            "$HIDDEN":true
-                        }],
-                    "$HIDDEN":false
+                                ]
+                        }]
+                },
+                {
+                    "x":30,
+                    "type":"Sprite",
+                    "searchKey":"Sprite",
+                    "props":{"y":999,"presetID":1,"preset":"laya/pages/prefab/Ground.prefab"},
+                    "nodeParent":3,
+                    "label":"Ground",
+                    "isOpen":null,
+                    "isDirectory":true,
+                    "isAniNode":true,
+                    "hasChild":true,
+                    "compId":20,
+                    "child":[
+                        {
+                            "type":"RigidBody",
+                            "switchAble":true,
+                            "searchKey":"RigidBody",
+                            "removeAble":true,
+                            "props":{"presetID":2,"preset":"laya/pages/prefab/Ground.prefab"},
+                            "nodeParent":20,
+                            "label":"RigidBody(Ground)",
+                            "isDirectory":false,
+                            "isClose":true,
+                            "isAniNode":true,
+                            "hasChild":false,
+                            "compId":21,
+                            "child":[
+                                ]
+                        },
+                        {
+                            "type":"BoxCollider",
+                            "switchAble":true,
+                            "searchKey":"BoxCollider",
+                            "removeAble":true,
+                            "props":{"presetID":3,"preset":"laya/pages/prefab/Ground.prefab"},
+                            "nodeParent":20,
+                            "label":"BoxCollider(Ground)",
+                            "isDirectory":false,
+                            "isClose":true,
+                            "isAniNode":true,
+                            "hasChild":false,
+                            "compId":22,
+                            "child":[
+                                ]
+                        }]
                 }]
         },
         {
