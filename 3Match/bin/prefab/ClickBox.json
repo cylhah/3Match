@@ -1,0 +1,1 @@
+{"type":"Sprite","props":{"y":0,"x":0,"width":84,"presetID":1,"name":"ClickBox","isPresetRoot":true,"height":1280},"compId":12,"child":[{"type":"Script","props":{"presetID":2,"runtime":"script/ClickBox.ts"},"compId":13}],"loadList":[],"loadList3D":[]}

@@ -8,31 +8,59 @@
       }
   }
 
-  class MainGame extends Laya.Script {
-      constructor() {
-          super();
-          this.GameMeshWidth = 7;
-          this.GameMeshHeight = 8;
-          this.InitialGameMeshHeight = 2;
-          this.GameBoxItemSize = new Vector2(84, 84);
-          this.GameMeshStartPosition = new Vector2(0, 588);
+  class MGameConfig {
+  }
+  MGameConfig.GameMeshWidth = 7;
+  MGameConfig.GameMeshHeight = 8;
+  MGameConfig.InitialGameMeshHeight = 2;
+  MGameConfig.GameBoxItemSize = new Vector2(84, 84);
+  MGameConfig.GameMeshStartPosition = new Vector2(0, 588);
+
+  class ClickBox extends Laya.Script {
+      init(gameMeshX) {
+          this.gameMeshX = gameMeshX;
+          let sprite = this.owner;
+          let offsetX = ClickBox.ClickBoxStartPosition.x +
+              gameMeshX * MGameConfig.GameBoxItemSize.x;
+          sprite.pos(offsetX, 0);
       }
+      onClick(e) {
+          console.log(this.gameMeshX);
+      }
+  }
+  ClickBox.ClickBoxStartPosition = new Vector2(66, 0);
+
+  class MainGame extends Laya.Script {
       onAwake() {
           this.gameBoard = (this.owner.getChildByName("GameBackground").getChildByName("GameBoard"));
-          let InitialGameCount = this.InitialGameMeshHeight * this.GameMeshWidth;
+          this.clickContainer = (this.owner
+              .getChildByName("GameBackground")
+              .getChildByName("ClickContainer"));
+          this.initGameBoard();
+          this.initClickBoxes();
+      }
+      initGameBoard() {
+          let InitialGameCount = MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
           for (let i = 0; i < InitialGameCount; i++) {
-              let gameMeshX = i % this.GameMeshWidth;
-              let gameMeshY = Math.floor(i / this.GameMeshWidth);
-              let positionOffset = new Vector2(this.GameBoxItemSize.x * gameMeshX, this.GameBoxItemSize.y * gameMeshY);
-              let positionX = this.GameMeshStartPosition.x + positionOffset.x;
-              let positionY = this.GameMeshStartPosition.y - positionOffset.y;
+              let gameMeshX = i % MGameConfig.GameMeshWidth;
+              let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
+              let positionX = MGameConfig.GameMeshStartPosition.x +
+                  MGameConfig.GameBoxItemSize.x * gameMeshX;
+              let positionY = MGameConfig.GameMeshStartPosition.y -
+                  MGameConfig.GameBoxItemSize.y * gameMeshY;
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
               box.pos(positionX, positionY);
               this.gameBoard.addChild(box);
           }
       }
-      onEnable() { }
-      onDisable() { }
+      initClickBoxes() {
+          for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
+              let clickBox = Laya.Pool.getItemByCreateFun("ClickBox", this.ClickBox.create, this.ClickBox);
+              let script = clickBox.getComponent(ClickBox);
+              script.init(i);
+              this.clickContainer.addChild(clickBox);
+          }
+      }
   }
 
   var Scene = Laya.Scene;
@@ -204,6 +232,7 @@
       }
       static init() {
           var reg = Laya.ClassUtils.regClass;
+          reg("script/ClickBox.ts", ClickBox);
           reg("script/MainGame.ts", MainGame);
           reg("script/GameUI.ts", GameUI);
           reg("script/GameControl.ts", GameControl);
@@ -211,12 +240,12 @@
           reg("script/DropBox.ts", DropBox);
       }
   }
-  GameConfig.width = 640;
-  GameConfig.height = 1136;
-  GameConfig.scaleMode = "fixedwidth";
+  GameConfig.width = 720;
+  GameConfig.height = 1280;
+  GameConfig.scaleMode = "fixedheight";
   GameConfig.screenMode = "none";
   GameConfig.alignV = "top";
-  GameConfig.alignH = "left";
+  GameConfig.alignH = "center";
   GameConfig.startScene = "Main/Main.scene";
   GameConfig.sceneRoot = "";
   GameConfig.debug = false;

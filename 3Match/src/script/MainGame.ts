@@ -1,41 +1,42 @@
-import { Vector2 } from "./GameData/CommonData";
+import ClickBox from "../script/ClickBox";
+import { MGameConfig } from "./GameData/Variables";
 
 export default class MainGame extends Laya.Script {
-  /** @prop {name:GameMeshWidth, tips:"网格总宽度", type:Int, default:7}*/
-  public GameMeshWidth: number = 7;
-  /** @prop {name:GameMeshHeight, tips:"网格总高度", type:Int, default:8}*/
-  public GameMeshHeight: number = 8;
   /** @prop {name:GameBoxItem,tips:"游戏方块",type:Prefab}*/
   public GameBoxItem: Laya.Prefab;
-  /** @prop {name:InitialGameMeshHeight, tips:"初始游戏高度", type:Int, default:2}*/
-  public InitialGameMeshHeight: number = 2;
-
-  private GameBoxItemSize: Vector2 = new Vector2(84, 84);
-  private GameMeshStartPosition: Vector2 = new Vector2(0, 588);
+  /** @prop {name:ClickBox,type:Prefab}*/
+  public ClickBox: Laya.Prefab;
 
   private gameBoard: Laya.Sprite;
-
-  constructor() {
-    super();
-  }
+  private clickContainer: Laya.Sprite;
 
   onAwake(): void {
     this.gameBoard = <Laya.Sprite>(
       this.owner.getChildByName("GameBackground").getChildByName("GameBoard")
     );
+    this.clickContainer = <Laya.Sprite>(
+      this.owner
+        .getChildByName("GameBackground")
+        .getChildByName("ClickContainer")
+    );
 
-    let InitialGameCount = this.InitialGameMeshHeight * this.GameMeshWidth;
+    this.initGameBoard();
+    this.initClickBoxes();
+  }
+
+  initGameBoard() {
+    let InitialGameCount =
+      MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
     for (let i = 0; i < InitialGameCount; i++) {
-      let gameMeshX = i % this.GameMeshWidth;
-      let gameMeshY = Math.floor(i / this.GameMeshWidth);
+      let gameMeshX = i % MGameConfig.GameMeshWidth;
+      let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
 
-      let positionOffset = new Vector2(
-        this.GameBoxItemSize.x * gameMeshX,
-        this.GameBoxItemSize.y * gameMeshY
-      );
-
-      let positionX = this.GameMeshStartPosition.x + positionOffset.x;
-      let positionY = this.GameMeshStartPosition.y - positionOffset.y;
+      let positionX =
+        MGameConfig.GameMeshStartPosition.x +
+        MGameConfig.GameBoxItemSize.x * gameMeshX;
+      let positionY =
+        MGameConfig.GameMeshStartPosition.y -
+        MGameConfig.GameBoxItemSize.y * gameMeshY;
       let box: Laya.Sprite = Laya.Pool.getItemByCreateFun(
         "GameBoxItem",
         this.GameBoxItem.create,
@@ -47,7 +48,17 @@ export default class MainGame extends Laya.Script {
     }
   }
 
-  onEnable(): void {}
+  initClickBoxes() {
+    for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
+      let clickBox: Laya.Sprite = Laya.Pool.getItemByCreateFun(
+        "ClickBox",
+        this.ClickBox.create,
+        this.ClickBox
+      );
 
-  onDisable(): void {}
+      let script: ClickBox = clickBox.getComponent(ClickBox);
+      script.init(i);
+      this.clickContainer.addChild(clickBox);
+    }
+  }
 }
