@@ -64,8 +64,7 @@
   }
 
   class GameConfig {
-      constructor() {
-      }
+      constructor() { }
       static init() {
           var reg = Laya.ClassUtils.regClass;
           reg("script/MainGame.ts", MainGame);
