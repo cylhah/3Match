@@ -5,7 +5,7 @@
     "searchKey":"Sprite,BoxItem",
     "props":{"y":0,"x":0,"width":84,"texture":"image/1586f6ec-a9b0-40a2-ba9b-a3202d93b523.png","presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab","name":"BoxItem","isPresetRoot":true,"height":84},
     "nodeParent":-1,
-    "maxID":8,
+    "maxID":9,
     "label":"BoxItem",
     "isOpen":null,
     "isDirectory":true,
@@ -41,6 +41,22 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":7,
+            "child":[
+                ]
+        },
+        {
+            "type":"Script",
+            "switchAble":true,
+            "source":"src/script/BoxItem.ts",
+            "searchKey":"Script,BoxItem",
+            "removeAble":true,
+            "props":{"presetID":4,"preset":"laya/pages/prefab/BoxItem.prefab"},
+            "nodeParent":5,
+            "label":"BoxItem",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":8,
             "child":[
                 ]
         }],

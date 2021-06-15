@@ -1,5 +1,7 @@
-import { Vector2 } from "./GameData/CommonData";
-import { MGameConfig } from "./GameData/Variables";
+import { EventManager } from "./common/EventManager";
+import { MCustomEvent } from "./common/MCustomEvent";
+import { Vector2 } from "./gameData/CommonData";
+import { MGameConfig } from "./gameData/Variables";
 
 export default class ClickBox extends Laya.Script {
   private static ClickBoxStartPosition: Vector2 = new Vector2(66, 0);
@@ -16,6 +18,6 @@ export default class ClickBox extends Laya.Script {
   }
 
   onClick(e: Laya.Event) {
-    console.log(this.gameMeshX);
+    EventManager.Instance.event(MCustomEvent.ClickGameBoard, this.gameMeshX);
   }
 }

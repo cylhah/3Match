@@ -1,5 +1,6 @@
 import ClickBox from "../script/ClickBox";
-import { MGameConfig } from "./GameData/Variables";
+import BoxItem from "../script/BoxItem";
+import { MGameConfig } from "./gameData/Variables";
 
 export default class MainGame extends Laya.Script {
   /** @prop {name:GameBoxItem,tips:"游戏方块",type:Prefab}*/
@@ -10,7 +11,7 @@ export default class MainGame extends Laya.Script {
   private gameBoard: Laya.Sprite;
   private clickContainer: Laya.Sprite;
 
-  onAwake(): void {
+  onAwake() {
     this.gameBoard = <Laya.Sprite>(
       this.owner.getChildByName("GameBackground").getChildByName("GameBoard")
     );
@@ -31,21 +32,26 @@ export default class MainGame extends Laya.Script {
       let gameMeshX = i % MGameConfig.GameMeshWidth;
       let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
 
-      let positionX =
-        MGameConfig.GameMeshStartPosition.x +
-        MGameConfig.GameBoxItemSize.x * gameMeshX;
-      let positionY =
-        MGameConfig.GameMeshStartPosition.y -
-        MGameConfig.GameBoxItemSize.y * gameMeshY;
       let box: Laya.Sprite = Laya.Pool.getItemByCreateFun(
         "GameBoxItem",
         this.GameBoxItem.create,
         this.GameBoxItem
       );
-      box.pos(positionX, positionY);
+      let scirpt: BoxItem = box.getComponent(BoxItem);
+      scirpt.init(1);
+      scirpt.posToGameBoard(gameMeshX, gameMeshY);
 
       this.gameBoard.addChild(box);
     }
+
+    let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun(
+      "GameBoxItem",
+      this.GameBoxItem.create,
+      this.GameBoxItem
+    );
+    let scirpt: BoxItem = readyBox.getComponent(BoxItem);
+    scirpt.init(0);
+    this.gameBoard.addChild(readyBox);
   }
 
   initClickBoxes() {

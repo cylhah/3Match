@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"Scene",
-    "selectedBox":3,
-    "selecteID":24,
+    "selectedBox":2,
+    "selecteID":18,
     "searchKey":"Scene",
     "props":{"width":720,"sceneColor":"#000000","height":1280},
     "nodeParent":-1,
@@ -58,50 +58,6 @@
                         ],
                     "$LOCKED":false,
                     "$HIDDEN":true
-                },
-                {
-                    "x":30,
-                    "type":"Sprite",
-                    "searchKey":"Sprite",
-                    "props":{"y":243,"x":318,"presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab"},
-                    "nodeParent":3,
-                    "label":"BoxItem",
-                    "isOpen":false,
-                    "isDirectory":true,
-                    "isAniNode":true,
-                    "hasChild":true,
-                    "compId":18,
-                    "child":[
-                        {
-                            "type":"RigidBody",
-                            "switchAble":true,
-                            "searchKey":"RigidBody",
-                            "removeAble":true,
-                            "props":{"presetID":2,"preset":"laya/pages/prefab/BoxItem.prefab"},
-                            "nodeParent":18,
-                            "label":"RigidBody(BoxItem)",
-                            "isDirectory":false,
-                            "isAniNode":true,
-                            "hasChild":false,
-                            "compId":19,
-                            "child":[
-                                ]
-                        },
-                        {
-                            "type":"BoxCollider",
-                            "switchAble":true,
-                            "searchKey":"BoxCollider",
-                            "removeAble":true,
-                            "props":{"presetID":3,"preset":"laya/pages/prefab/BoxItem.prefab"},
-                            "nodeParent":18,
-                            "label":"BoxCollider(BoxItem)",
-                            "isDirectory":false,
-                            "isAniNode":true,
-                            "hasChild":false,
-                            "compId":23,
-                            "child":[
-                                ]
-                        }]
                 },
                 {
                     "x":30,

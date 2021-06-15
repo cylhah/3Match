@@ -1,6 +1,47 @@
 (function () {
   'use strict';
 
+  class EventManager {
+      constructor() {
+          this.eventDispatcher = new Laya.EventDispatcher();
+      }
+      static get Instance() {
+          if (!this.inst) {
+              this.inst = new EventManager();
+          }
+          return this.inst;
+      }
+      hasListener(type) {
+          return this.eventDispatcher.hasListener(type);
+      }
+      event(type, data) {
+          return this.eventDispatcher.event(type, data);
+      }
+      on(type, caller, listener, arg) {
+          return this.eventDispatcher.on(type, caller, listener, arg);
+      }
+      once(type, caller, listener, args) {
+          return this.eventDispatcher.once(type, caller, listener, args);
+      }
+      off(type, caller, listener, onceOnly) {
+          return this.eventDispatcher.off(type, caller, listener, onceOnly);
+      }
+      offAll(type) {
+          return this.eventDispatcher.offAll(type);
+      }
+      offAllCaller(caller) {
+          return this.eventDispatcher.offAllCaller(caller);
+      }
+      isMouseEvent(type) {
+          return this.eventDispatcher.isMouseEvent(type);
+      }
+  }
+
+  var MCustomEvent;
+  (function (MCustomEvent) {
+      MCustomEvent["ClickGameBoard"] = "ClickGameBoard";
+  })(MCustomEvent || (MCustomEvent = {}));
+
   class Vector2 {
       constructor(nx, ny) {
           this.x = nx;
@@ -25,10 +66,38 @@
           sprite.pos(offsetX, 0);
       }
       onClick(e) {
-          console.log(this.gameMeshX);
+          EventManager.Instance.event(MCustomEvent.ClickGameBoard, this.gameMeshX);
       }
   }
   ClickBox.ClickBoxStartPosition = new Vector2(66, 0);
+
+  class BoxItem extends Laya.Script {
+      init(type) {
+          if (type == 0) {
+              EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+              this.posToGameBoardReadyArea();
+              let rigidBody = this.owner.getComponent(Laya.RigidBody);
+              rigidBody.enabled = false;
+          }
+      }
+      posToGameBoardReadyArea() {
+          console.log("posToGameBoardReadyArea");
+          this.owner.pos(252, -84);
+      }
+      posToGameBoard(gameMeshX, gameMeshY) {
+          let positionX = MGameConfig.GameMeshStartPosition.x +
+              MGameConfig.GameBoxItemSize.x * gameMeshX;
+          let positionY = MGameConfig.GameMeshStartPosition.y -
+              MGameConfig.GameBoxItemSize.y * gameMeshY;
+          this.owner.pos(positionX, positionY);
+      }
+      onDestroy() {
+          EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+      }
+      onGameBoardClick(clickMeshX) {
+          console.log("onGameBoardClick", clickMeshX);
+      }
+  }
 
   class MainGame extends Laya.Script {
       onAwake() {
@@ -44,14 +113,16 @@
           for (let i = 0; i < InitialGameCount; i++) {
               let gameMeshX = i % MGameConfig.GameMeshWidth;
               let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
-              let positionX = MGameConfig.GameMeshStartPosition.x +
-                  MGameConfig.GameBoxItemSize.x * gameMeshX;
-              let positionY = MGameConfig.GameMeshStartPosition.y -
-                  MGameConfig.GameBoxItemSize.y * gameMeshY;
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
-              box.pos(positionX, positionY);
+              let scirpt = box.getComponent(BoxItem);
+              scirpt.init(1);
+              scirpt.posToGameBoard(gameMeshX, gameMeshY);
               this.gameBoard.addChild(box);
           }
+          let readyBox = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
+          let scirpt = readyBox.getComponent(BoxItem);
+          scirpt.init(0);
+          this.gameBoard.addChild(readyBox);
       }
       initClickBoxes() {
           for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
@@ -68,6 +139,7 @@
       static init() {
           var reg = Laya.ClassUtils.regClass;
           reg("script/MainGame.ts", MainGame);
+          reg("script/BoxItem.ts", BoxItem);
           reg("script/ClickBox.ts", ClickBox);
       }
   }
