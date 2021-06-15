@@ -77,7 +77,7 @@
               EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
               this.posToGameBoardReadyArea();
               let rigidBody = this.owner.getComponent(Laya.RigidBody);
-              rigidBody.enabled = false;
+              rigidBody.destroy();
           }
       }
       posToGameBoardReadyArea() {
@@ -96,6 +96,12 @@
       }
       onGameBoardClick(clickMeshX) {
           console.log("onGameBoardClick", clickMeshX);
+          let sprite = this.owner;
+          let offsetX = clickMeshX * 84;
+          Laya.Tween.to(sprite, { x: offsetX, y: -84 }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete));
+      }
+      onTweenCompelete() {
+          this.owner.addComponent(Laya.RigidBody);
       }
   }
 
