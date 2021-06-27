@@ -1,4 +1,4 @@
-// v1.8.7
+// v1.8.6
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -181,20 +181,7 @@ gulp.task("optimizeOpen_WX", ["version_WX"], function(cb) {
 });
 
 gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
-	if (!config.uesEnginePlugin) { // 没有使用引擎插件，还是像以前一样发布
-		let gameJsonPath = path.join(releaseDir, "game.json");
-		let gameJsonContent = fs.readFileSync(gameJsonPath, "utf8");
-		let conJson = JSON.parse(gameJsonContent);
-		if (conJson.plugins) {
-			delete conJson.plugins;
-			gameJsonContent = JSON.stringify(conJson, null, 4);
-			fs.writeFileSync(gameJsonPath, gameJsonContent, "utf8");
-
-			let gameJsPath = path.join(releaseDir, "game.js");
-			let gameJscontent = fs.readFileSync(gameJsPath, "utf8");
-			gameJscontent = gameJscontent.replace(/requirePlugin\("[\w\/\.]+"\);?\n?/mg, "");
-			fs.writeFileSync(gameJsPath, gameJscontent, "utf8");
-		}
+	if (!config.uesEnginePlugin) { // 没有使用微信引擎插件，还是像以前一样发布
 		return cb();
 	}
 	if (config.version) {

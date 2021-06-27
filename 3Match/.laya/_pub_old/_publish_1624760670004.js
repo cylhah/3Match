@@ -1,4 +1,4 @@
-// v1.8.8
+// v1.8.6
 //是否使用IDE自带的node环境和插件，设置false后，则使用自己环境(使用命令行方式执行)
 const useIDENode = process.argv[0].indexOf("LayaAir") > -1 ? true : false;
 const useCMDNode = process.argv[1].indexOf("layaair2-cmd") > -1 ? true : false;
@@ -28,9 +28,7 @@ const babel = require(ideModuleDir + 'gulp-babel');
 
 // 结合compile.js使用
 global.publish = true;
-const fileList = ["compile.js", "pub_utils.js", "publish_xmgame.js", "publish_oppogame.js", "publish_vivogame.js", "publish_biligame.js",
-				"publish_alipaygame.js", "publish_wxgame.js", "publish_bdgame.js", "publish_qqgame.js", "publish_bytedancegame.js", "publish_hwgame.js",
-				"publish_taobaominiapp.js", "publish_youkugame.js", "publish_taobaowidget.js"];
+const fileList = ["compile.js", "pub_utils.js", "publish_xmgame.js", "publish_oppogame.js", "publish_vivogame.js", "publish_biligame.js", "publish_alipaygame.js", "publish_wxgame.js", "publish_bdgame.js", "publish_qqgame.js", "publish_bytedancegame.js", "publish_hwgame.js", "publish_taobaominiapp.js"];
 requireDir('./', {
 	filter: function (fullPath) {
 		// 只用到了compile.js和publish.js
@@ -57,8 +55,6 @@ let config,
 	opensslPath = "openssl";
 //任务对照列表
 const copyTasks = {
-	"taobaowidget": "preCreate_TBWidget",
-	"youkugame": "copyPlatformFile_youku",
 	"taobaominiapp": "preCreate_TBMini",
 	"hwgame": "copyPlatformFile_HW",
 	"bytedancegame": "copyPlatformFile_ByteDance",
@@ -73,8 +69,6 @@ const copyTasks = {
 	"web": "copyPlatformLibsJsFile"
 }
 const tasks = {
-	"taobaowidget": "buildTBWidgetProj",
-	"youkugame": "buildYKProj",
 	"taobaominiapp": "buildTBMiniProj",
 	"hwgame": "buildHWProj",
 	"bytedancegame": "buildByteDanceProj",
@@ -113,7 +107,7 @@ gulp.task("loadConfig", function (cb) {
 	global.platform = platform;
 	let file = fs.readFileSync(_path, "utf-8");
 	if (file) {
-		if ([...QUICKGAMELIST, "taobaominiapp", "taobaowidget"].includes(platform)) {
+		if ([...QUICKGAMELIST, "taobaominiapp"].includes(platform)) {
 			file = file.replace(/\$basePath/g, releaseDir + "/temprelease");
 		} else {
 			file = file.replace(/\$basePath/g, releaseDir);
@@ -220,8 +214,6 @@ gulp.task("clearReleaseDir", ["compile"], function (cb) {
 				delList = [`${releaseDir}/node_modules/layaengine/libs`, `${releaseDir}/node_modules/layaengine/laya.js`,
 							// `${releaseDir}/node_modules/layaengine`, `!${releaseDir}/node_modules/layaengine`, `!${releaseDir}/node_modules/layaengine/{adapter.js,index.js/package.json}`,
 							`${releaseDir}/pages/index/**`, `!${releaseDir}/pages/index`, `!${releaseDir}/pages/index/{game.js,game.json,game.axml}`];
-			} else if (platform === "taobaowidget") {
-				delList = [`${releaseDir}/widget/component/**`, `!${releaseDir}/widget/component`, `!${releaseDir}/widget/component/{game.js,game.json,game.axml,game.acss,package.json}`];
 			}
 		}
 		del(delList, { force: true }).then(paths => {
@@ -256,7 +248,7 @@ gulp.task("copyFile", ["clearReleaseDir"], function () {
 		config.copyFilesFilter = config.copyFilesFilter.concat([`!${workSpaceDir}/bin/index.html`]);
 	}
 	// 快游戏，需要新建一个快游戏项目，拷贝的只是项目的一部分，将文件先拷贝到文件夹的临时目录中去
-	if ([...QUICKGAMELIST, "taobaominiapp", "taobaowidget"].includes(platform)) {
+	if ([...QUICKGAMELIST, "taobaominiapp"].includes(platform)) {
 		releaseDir = global.tempReleaseDir = path.join(releaseDir, "temprelease").replace(/\\/g, "/");
 	}
 	if (config.exclude) { // 排除文件
@@ -397,9 +389,6 @@ gulp.task("copyPlatformLibsJsFile", ["copyLibsJsFile"], function () {
 		case "taobaominiapp":
 			platformLibName = "laya.tbmini.js";
 			break;
-		case "taobaowidget":
-			platformLibName = "laya.tbpluginmini.js";
-			break;
 	}
 	let copyPath = `${workSpaceDir}/bin/libs`;
 	if (config.useMinJsLibs) {
@@ -464,7 +453,7 @@ gulp.task("compressJs", ["compressJson"], function () {
 			keep_fnames:true
 		}
 	}
-	if (["taobaominiapp", "taobaowidget"].includes(platform)) {
+	if ("taobaominiapp" === platform) {
 		options = {
 			mangle: {
 				keep_fnames:true,
@@ -596,19 +585,12 @@ gulp.task("version2", ["renameIndexJs"], function () {
 
 // 筛选4M包
 gulp.task("packfile", platformTask, function() {
-	let taobaoFolders = "";
-	switch (platform) {
-		case "taobaominiapp":
-			taobaoFolders = "pages/index";
-			break;
-		case "taobaowidget":
-			taobaoFolders = "widget/component";
-			break;
-		default:
-			taobaoFolders = "quickgame";
-	}
 	if (config.version) {
-		releaseDir = releaseDir.replace("temprelease", taobaoFolders);
+		if ("taobaominiapp" === platform) {
+			releaseDir = releaseDir.replace("temprelease", "pages/index");
+		} else {
+			releaseDir = releaseDir.replace("temprelease", "quickgame");
+		}
 		// 从release目录取得带有版本号的目录
 		let tempPackfile = `${workSpaceDir}/.laya/configTemp.json`;
 		let releasePackfile = `${releaseDir}/configTemp.json`;
@@ -618,8 +600,8 @@ gulp.task("packfile", platformTask, function() {
 		fs.unlinkSync(tempPackfile);
 		fs.unlinkSync(releasePackfile);
 	}
-	if (["taobaominiapp", "taobaowidget"].includes(platform)) {
-		releaseDir = releaseDir.replace("/temprelease", "").replace(`/${taobaoFolders}`, "");
+	if ("taobaominiapp" === platform) {
+		releaseDir = releaseDir.replace("/temprelease", "").replace("/pages/index", "");
 		for (let len = config.packfileFullValue.length, i = 0; i < len; i++) {
 			config.packfileFullValue[i] = config.packfileFullValue[i].replace("temprelease", "");
 		}

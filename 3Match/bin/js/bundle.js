@@ -76,8 +76,6 @@
           if (type == 0) {
               EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
               this.posToGameBoardReadyArea();
-              let rigidBody = this.owner.getComponent(Laya.RigidBody);
-              rigidBody.destroy();
           }
       }
       posToGameBoardReadyArea() {
@@ -141,7 +139,8 @@
   }
 
   class GameConfig {
-      constructor() { }
+      constructor() {
+      }
       static init() {
           var reg = Laya.ClassUtils.regClass;
           reg("script/MainGame.ts", MainGame);

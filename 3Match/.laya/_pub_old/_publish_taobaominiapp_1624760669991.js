@@ -1,4 +1,4 @@
-// v1.1.2
+// v1.1.0
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -81,7 +81,7 @@ gulp.task("modifyFile_TBMini", ["delFiles_TBMini"], function() {
 	indexFileContent = indexFileContent.replace(/(window.screenOrientation\s*=\s*"\w+"[,;]?)/gm, "/**$1*/");
 	indexFileContent = indexFileContent.replace(/loadLib(\(['"]libs\/)/gm, `require("layaengine/libs/`);
 	indexFileContent = indexFileContent.replace(/loadLib(\(['"])/gm, "require$1./");
-	indexFileContent = indexFileContent.replace(/require\(\"\.\/laya([-\w]*)\.js\"\)/gm, `require("layaengine/laya$1.js")`);
+	indexFileContent = indexFileContent.replace(`require("./laya.js")`, `require("layaengine/laya.js")`);
 	// 特殊的，增加清除缓存
 	indexFileContent = indexFileContent.replace(/(require(\(['"][\w\/\.]+['"]\));?)/gm, "delete require.cache[require.resolve$2];\n$1");
 	fs.writeFileSync(indexFilePath, indexFileContent, "utf-8");
@@ -105,7 +105,7 @@ gulp.task("modifyMinJs_TBMini", ["modifyFile_TBMini"], function() {
 });
 
 gulp.task("modifyLibsJs_TBMini", ["modifyMinJs_TBMini"], function() {
-	const NONCORESTR = "var window = $global.window;\nvar document = window.document;\nvar XMLHttpRequest = window.XMLHttpRequest;\nvar Laya = window.Laya;\nvar Laya3D = window.Laya3D;\nvar performance = window.performance;\nvar CANNON = window.CANNON;\n";
+	const NONCORESTR = "var window = $global.window;\nvar document = window.document;\nvar XMLHttpRequest = window.XMLHttpRequest;\nvar Laya = window.Laya;\nvar Laya3D = window.Laya3D;\n";
 	const CORESTR = "var window = $global.window;\nvar document = window.document;\nvar XMLHttpRequest = window.XMLHttpRequest;\n";
 	// libs
 	let libsPath = path.join(releaseDir, "node_modules", "layaengine", "libs", config.useMinJsLibs ? "min" : "");

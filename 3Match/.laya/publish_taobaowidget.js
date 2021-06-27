@@ -1,4 +1,4 @@
-// v1.1.2
+// v1.0.0
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -20,7 +20,7 @@ let versionCon; // 版本管理version.json
 let commandSuffix,
 	layarepublicPath;
 
-gulp.task("preCreate_TBMini", copyLibsTask, function() {
+gulp.task("preCreate_TBWidget", copyLibsTask, function() {
 	releaseDir = global.releaseDir;
 	tempReleaseDir = global.tempReleaseDir;
 	config = global.config;
@@ -28,16 +28,16 @@ gulp.task("preCreate_TBMini", copyLibsTask, function() {
 	layarepublicPath = global.layarepublicPath;
 });
 
-gulp.task("copyPlatformFile_TBMini", versiontask, function() {
+gulp.task("copyPlatformFile_TBWidget", versiontask, function() {
 	releaseDir = path.dirname(releaseDir);
-	let adapterPath = path.join(layarepublicPath, "LayaAirProjectPack", "lib", "data", "taobaofiles");
+	let adapterPath = path.join(layarepublicPath, "LayaAirProjectPack", "lib", "data", "taobaowidgetfiles");
 	let hasPublishPlatform = 
-		fs.existsSync(path.join(releaseDir, "app.js")) &&
-		fs.existsSync(path.join(releaseDir, "app.json")) &&
-		fs.existsSync(path.join(releaseDir, "package.json"));
+		fs.existsSync(path.join(releaseDir, "client")) &&
+		fs.existsSync(path.join(releaseDir, "widget")) &&
+		fs.existsSync(path.join(releaseDir, "mini.project.json"));
 	let copyLibsList;
 	if (hasPublishPlatform) {
-		copyLibsList = [`${adapterPath}/node_modules/layaengine/adapter.js`];
+		copyLibsList = [`${adapterPath}/widget/component/adapter.js`];
 	} else {
 		copyLibsList = [`${adapterPath}/**/*.*`];
 	}
@@ -45,18 +45,11 @@ gulp.task("copyPlatformFile_TBMini", versiontask, function() {
 	return stream.pipe(gulp.dest(releaseDir));
 });
 
-gulp.task("copyFiles2Pages_TBMini", ["copyPlatformFile_TBMini"], function() {
-	return gulp.src([`${tempReleaseDir}/**/*.*`, `!${tempReleaseDir}/libs/**/*.*`]).pipe(gulp.dest(`${releaseDir}/pages/index`));
+gulp.task("copyFiles2Pages_TBWidget", ["copyPlatformFile_TBWidget"], function() {
+	return gulp.src(`${tempReleaseDir}/**/*.*`).pipe(gulp.dest(`${releaseDir}/widget/component`));
 });
 
-gulp.task("moveToLibs_TBMini", ["copyFiles2Pages_TBMini"], function() {
-	let libsPath = path.join(tempReleaseDir, "libs");
-	let layaenginePath = path.join(releaseDir, "node_modules", "layaengine", "libs");
-	return gulp.src(`${libsPath}/**/*.*`)
-			.pipe(gulp.dest(layaenginePath));
-});
-
-gulp.task("delFiles_TBMini", ["moveToLibs_TBMini"], function(cb) {
+gulp.task("delFiles_TBWidget", ["copyFiles2Pages_TBWidget"], function(cb) {
 	let delList = [`${tempReleaseDir}/**`];
 	del(delList, { force: true }).then(paths => {
 		cb();
@@ -65,54 +58,57 @@ gulp.task("delFiles_TBMini", ["moveToLibs_TBMini"], function(cb) {
 	})
 });
 
-gulp.task("modifyFile_TBMini", ["delFiles_TBMini"], function() {
+gulp.task("modifyFile_TBWidget", ["delFiles_TBWidget"], function() {
 	if (config.version || config.enableVersion) {
-		let versionPath = path.join(releaseDir, "pages", "index", "version.json");
+		let versionPath = path.join(releaseDir, "widget", "component", "version.json");
 		versionCon = fs.readFileSync(versionPath, "utf-8");
 		versionCon = JSON.parse(versionCon);
 	}
 	// 修改index.js
 	let indexJsStr = (versionCon && versionCon["index.js"]) ? versionCon["index.js"] :  "index.js";
-	let indexFilePath = path.join(releaseDir, "pages", "index", indexJsStr);
+	let indexFilePath = path.join(releaseDir, "widget", "component", indexJsStr);
 	if (!fs.existsSync(indexFilePath)) {
 		return;
 	}
 	let indexFileContent = fs.readFileSync(indexFilePath, "utf-8");
 	indexFileContent = indexFileContent.replace(/(window.screenOrientation\s*=\s*"\w+"[,;]?)/gm, "/**$1*/");
-	indexFileContent = indexFileContent.replace(/loadLib(\(['"]libs\/)/gm, `require("layaengine/libs/`);
+	indexFileContent = indexFileContent.replace(/loadLib(\(['"]libs\/)/gm, `require("./libs/`);
 	indexFileContent = indexFileContent.replace(/loadLib(\(['"])/gm, "require$1./");
-	indexFileContent = indexFileContent.replace(/require\(\"\.\/laya([-\w]*)\.js\"\)/gm, `require("layaengine/laya$1.js")`);
+	indexFileContent = indexFileContent.replace(/require\(\"\.\/laya([-\w]*)\.js\"\)/gm, `require("./laya$1.js")`);
 	// 特殊的，增加清除缓存
 	indexFileContent = indexFileContent.replace(/(require(\(['"][\w\/\.]+['"]\));?)/gm, "delete require.cache[require.resolve$2];\n$1");
 	fs.writeFileSync(indexFilePath, indexFileContent, "utf-8");
 })
 
-gulp.task("modifyMinJs_TBMini", ["modifyFile_TBMini"], function() {
+gulp.task("modifyMinJs_TBWidget", ["modifyFile_TBWidget"], function() {
 	// 如果保留了平台文件，如果同时取消使用min类库，就会出现文件引用不正确的问题
 	if (config.keepPlatformFile) {
-		let fileJsPath = path.join(releaseDir, "pages", "index", "game.js");
+		let fileJsPath = path.join(releaseDir, "widget", "component", "game.js");
 		let content = fs.readFileSync(fileJsPath, "utf-8");
-		content = content.replace(/min\/laya(-[\w\d]+)?\.tbmini\.min\.js/gm, "laya.tbmini.js");
+		content = content.replace(/min\/laya(-[\w\d]+)?\.tbpluginmini\.min\.js/gm, "laya.tbpluginmini.js");
 		fs.writeFileSync(fileJsPath, content, 'utf-8');
 	}
 	if (!config.useMinJsLibs) {
 		return;
 	}
-	let fileJsPath = path.join(releaseDir, "pages", "index", "game.js");
+	let fileJsPath = path.join(releaseDir, "widget", "component", "game.js");
 	let content = fs.readFileSync(fileJsPath, "utf-8");
-	content = content.replace(/(min\/)?laya(-[\w\d]+)?\.tbmini(\.min)?\.js/gm, "min/laya.tbmini.min.js");
+	content = content.replace(/(min\/)?laya(-[\w\d]+)?\.tbpluginmini(\.min)?\.js/gm, "min/laya.tbpluginmini.min.js");
 	fs.writeFileSync(fileJsPath, content, 'utf-8');
 });
 
-gulp.task("modifyLibsJs_TBMini", ["modifyMinJs_TBMini"], function() {
+gulp.task("modifyLibsJs_TBWidget", ["modifyMinJs_TBWidget"], function() {
 	const NONCORESTR = "var window = $global.window;\nvar document = window.document;\nvar XMLHttpRequest = window.XMLHttpRequest;\nvar Laya = window.Laya;\nvar Laya3D = window.Laya3D;\nvar performance = window.performance;\nvar CANNON = window.CANNON;\n";
 	const CORESTR = "var window = $global.window;\nvar document = window.document;\nvar XMLHttpRequest = window.XMLHttpRequest;\n";
 	// libs
-	let libsPath = path.join(releaseDir, "node_modules", "layaengine", "libs", config.useMinJsLibs ? "min" : "");
+	let libsPath = path.join(releaseDir, "widget", "component", "libs", config.useMinJsLibs ? "min" : "");
 	let libsList = fs.readdirSync(libsPath);
 	for (let libName, fullPath, con, len = libsList.length, i = 0; i < len; i++) {
 		libName = libsList[i];
 		fullPath = path.join(libsPath, libName);
+		if (path.extname(fullPath) !== ".js") {
+			continue;
+		}
 		con = fs.readFileSync(fullPath, "utf8");
 		if (/laya(-[\w\d]+)?\.core/gm.test(libName)) {
 			con = CORESTR + con;
@@ -123,7 +119,7 @@ gulp.task("modifyLibsJs_TBMini", ["modifyMinJs_TBMini"], function() {
 	}
 	// bundle.js
 	let bundleJsStr = (versionCon && versionCon["js/bundle.js"]) ? versionCon["js/bundle.js"] :  "js/bundle.js";
-	let bundlePath = path.join(releaseDir, "pages", "index", bundleJsStr);
+	let bundlePath = path.join(releaseDir, "widget", "component", bundleJsStr);
 	let con = fs.readFileSync(bundlePath, "utf8");
 	// as 侵入式的修改bundle.js
 	if (fs.existsSync(path.join(workSpaceDir, "asconfig.json"))) {
@@ -149,37 +145,33 @@ gulp.task("modifyLibsJs_TBMini", ["modifyMinJs_TBMini"], function() {
 	fs.writeFileSync(bundlePath, con, "utf8");
 	// laya.js
 	let layaJsStr = (versionCon && versionCon["laya.js"]) ? versionCon["laya.js"] :  "laya.js";
-	let layaPath = path.join(releaseDir, "pages", "index", layaJsStr);
+	let layaPath = path.join(releaseDir, "widget", "component", layaJsStr);
 	if (fs.existsSync(layaPath)) {
 		let con = fs.readFileSync(layaPath, "utf8");
 		con = CORESTR + con;
-
-		// 移动到 layaengine 下
-		let newLayaPath = path.join(releaseDir, "node_modules", "layaengine", layaJsStr);
-		fs.writeFileSync(newLayaPath, con, "utf8");
-		fs.unlinkSync(layaPath);
+		fs.writeFileSync(layaPath, con, "utf8");
 	}
 });
 
-gulp.task("version_TBMini", ["modifyLibsJs_TBMini"], function() {
+gulp.task("version_TBWidget", ["modifyLibsJs_TBWidget"], function() {
 	// 如果保留了平台文件，如果同时开启版本管理，就会出现文件引用不正确的问题
 	if (config.keepPlatformFile) {
-		let fileJsPath = path.join(releaseDir, "pages", "index", "game.js");
+		let fileJsPath = path.join(releaseDir, "widget", "component", "game.js");
 		let content = fs.readFileSync(fileJsPath, "utf-8");
-		content = content.replace(/laya(-[\w\d]+)?\.tbmini/gm, "laya.tbmini");
+		content = content.replace(/laya(-[\w\d]+)?\.tbpluginmini/gm, "laya.tbpluginmini");
 		content = content.replace(/index(-[\w\d]+)?\.js/gm, "index.js");
 		fs.writeFileSync(fileJsPath, content, 'utf-8');
 	}
 	if (config.version) {
-		let versionPath = path.join(releaseDir, "pages", "index", "version.json");
-		let gameJSPath = path.join(releaseDir, "pages", "index", "game.js");
+		let versionPath = path.join(releaseDir, "widget", "component", "version.json");
+		let gameJSPath = path.join(releaseDir, "widget", "component", "game.js");
 		let srcList = [versionPath, gameJSPath];
 		return gulp.src(srcList)
 			.pipe(revCollector())
-			.pipe(gulp.dest(`${releaseDir}/pages/index`));
+			.pipe(gulp.dest(`${releaseDir}/widget/component`));
 	}
 });
 
-gulp.task("buildTBMiniProj", ["version_TBMini"], function() {
+gulp.task("buildTBWidgetProj", ["version_TBWidget"], function() {
 	console.log("all tasks completed");
 });

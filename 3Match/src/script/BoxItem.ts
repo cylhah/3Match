@@ -19,8 +19,8 @@ export default class BoxItem extends Laya.Script {
 
       this.posToGameBoardReadyArea();
 
-      let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
-      rigidBody.destroy();
+      // let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
+      // rigidBody.destroy();
     //   rigidBody.
     }
   }

@@ -1,4 +1,4 @@
-// v1.1.0
+// v1.1.1
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -58,6 +58,11 @@ gulp.task("modifyFile_ByteDance", versiontask, function() {
 	let content = fs.readFileSync(gameJsonPath, "utf8");
 	let conJson = JSON.parse(content);
 	conJson.deviceOrientation = config.bytedanceInfo.orientation;
+	if (config.bytedanceInfo.subpack) { // 分包
+		conJson.subpackages = config.bytedanceSubpack;
+	} else {
+		delete conJson.subpackages;
+	}
 	content = JSON.stringify(conJson, null, 4);
 	fs.writeFileSync(gameJsonPath, content, "utf8");
 
@@ -114,7 +119,20 @@ gulp.task("version_ByteDance", ["modifyMinJs_ByteDance"], function() {
 });
 
 gulp.task("pluginEngin_ByteDance", ["version_ByteDance"], function(cb) {
-	if (!config.uesEnginePlugin) { // 没有使用微信引擎插件，还是像以前一样发布
+	if (!config.uesEnginePlugin) { // 没有使用引擎插件，还是像以前一样发布
+		let gameJsonPath = path.join(releaseDir, "game.json");
+		let gameJsonContent = fs.readFileSync(gameJsonPath, "utf8");
+		let conJson = JSON.parse(gameJsonContent);
+		if (conJson.plugins) {
+			delete conJson.plugins;
+			gameJsonContent = JSON.stringify(conJson, null, 4);
+			fs.writeFileSync(gameJsonPath, gameJsonContent, "utf8");
+
+			let gameJsPath = path.join(releaseDir, "game.js");
+			let gameJscontent = fs.readFileSync(gameJsPath, "utf8");
+			gameJscontent = gameJscontent.replace(/requirePlugin\("[\w\/\.]+"\);?\n?/mg, "");
+			fs.writeFileSync(gameJsPath, gameJscontent, "utf8");
+		}
 		return cb();
 	}
 	if (config.version) {
