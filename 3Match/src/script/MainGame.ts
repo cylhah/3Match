@@ -12,43 +12,27 @@ export default class MainGame extends Laya.Script {
   private clickContainer: Laya.Sprite;
 
   onAwake() {
-    this.gameBoard = <Laya.Sprite>(
-      this.owner.getChildByName("GameBackground").getChildByName("GameBoard")
-    );
-    this.clickContainer = <Laya.Sprite>(
-      this.owner
-        .getChildByName("GameBackground")
-        .getChildByName("ClickContainer")
-    );
+    this.gameBoard = <Laya.Sprite>this.owner.getChildByName("GameBackground").getChildByName("GameBoard");
+    this.clickContainer = <Laya.Sprite>this.owner.getChildByName("GameBackground").getChildByName("ClickContainer");
 
     this.initGameBoard();
     this.initClickBoxes();
   }
 
   initGameBoard() {
-    let InitialGameCount =
-      MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
+    let InitialGameCount = MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
     for (let i = 0; i < InitialGameCount; i++) {
       let gameMeshX = i % MGameConfig.GameMeshWidth;
       let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
 
-      let box: Laya.Sprite = Laya.Pool.getItemByCreateFun(
-        "GameBoxItem",
-        this.GameBoxItem.create,
-        this.GameBoxItem
-      );
+      let box: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
       let scirpt: BoxItem = box.getComponent(BoxItem);
       scirpt.init(1);
       scirpt.posToGameBoard(gameMeshX, gameMeshY);
-
       this.gameBoard.addChild(box);
     }
 
-    let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun(
-      "GameBoxItem",
-      this.GameBoxItem.create,
-      this.GameBoxItem
-    );
+    let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
     let scirpt: BoxItem = readyBox.getComponent(BoxItem);
     scirpt.init(0);
     this.gameBoard.addChild(readyBox);
@@ -56,11 +40,7 @@ export default class MainGame extends Laya.Script {
 
   initClickBoxes() {
     for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
-      let clickBox: Laya.Sprite = Laya.Pool.getItemByCreateFun(
-        "ClickBox",
-        this.ClickBox.create,
-        this.ClickBox
-      );
+      let clickBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("ClickBox", this.ClickBox.create, this.ClickBox);
 
       let script: ClickBox = clickBox.getComponent(ClickBox);
       script.init(i);

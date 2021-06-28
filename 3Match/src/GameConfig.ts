@@ -8,7 +8,7 @@ import ClickBox from "./script/ClickBox"
 export default class GameConfig{
     static width:number=720;
     static height:number=1280;
-    static scaleMode:string="fixedheight";
+    static scaleMode:string="fixedauto";
     static screenMode:string="none";
     static alignV:string="top";
     static alignH:string="center";

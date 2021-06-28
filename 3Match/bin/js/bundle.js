@@ -76,6 +76,7 @@
           if (type == 0) {
               EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
               this.posToGameBoardReadyArea();
+              let rigidBody = this.owner.getComponent(Laya.RigidBody);
           }
       }
       posToGameBoardReadyArea() {
@@ -83,10 +84,8 @@
           this.owner.pos(252, -84);
       }
       posToGameBoard(gameMeshX, gameMeshY) {
-          let positionX = MGameConfig.GameMeshStartPosition.x +
-              MGameConfig.GameBoxItemSize.x * gameMeshX;
-          let positionY = MGameConfig.GameMeshStartPosition.y -
-              MGameConfig.GameBoxItemSize.y * gameMeshY;
+          let positionX = MGameConfig.GameMeshStartPosition.x + MGameConfig.GameBoxItemSize.x * gameMeshX;
+          let positionY = MGameConfig.GameMeshStartPosition.y - MGameConfig.GameBoxItemSize.y * gameMeshY;
           this.owner.pos(positionX, positionY);
       }
       onDestroy() {
@@ -105,10 +104,8 @@
 
   class MainGame extends Laya.Script {
       onAwake() {
-          this.gameBoard = (this.owner.getChildByName("GameBackground").getChildByName("GameBoard"));
-          this.clickContainer = (this.owner
-              .getChildByName("GameBackground")
-              .getChildByName("ClickContainer"));
+          this.gameBoard = this.owner.getChildByName("GameBackground").getChildByName("GameBoard");
+          this.clickContainer = this.owner.getChildByName("GameBackground").getChildByName("ClickContainer");
           this.initGameBoard();
           this.initClickBoxes();
       }
@@ -139,8 +136,7 @@
   }
 
   class GameConfig {
-      constructor() {
-      }
+      constructor() { }
       static init() {
           var reg = Laya.ClassUtils.regClass;
           reg("script/MainGame.ts", MainGame);
@@ -150,7 +146,7 @@
   }
   GameConfig.width = 720;
   GameConfig.height = 1280;
-  GameConfig.scaleMode = "fixedheight";
+  GameConfig.scaleMode = "fixedauto";
   GameConfig.screenMode = "none";
   GameConfig.alignV = "top";
   GameConfig.alignH = "center";

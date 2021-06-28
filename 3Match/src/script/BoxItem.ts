@@ -11,17 +11,14 @@ export default class BoxItem extends Laya.Script {
    */
   init(type: number) {
     if (type == 0) {
-      EventManager.Instance.on(
-        MCustomEvent.ClickGameBoard,
-        this,
-        this.onGameBoardClick
-      );
+      EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
 
       this.posToGameBoardReadyArea();
 
-      // let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
-      // rigidBody.destroy();
-    //   rigidBody.
+      let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
+      // rigidBody.destroy()
+      // rigidBody.
+      // rigidBody.gravityScale = 0
     }
   }
 
@@ -31,39 +28,28 @@ export default class BoxItem extends Laya.Script {
   }
 
   posToGameBoard(gameMeshX: number, gameMeshY: number) {
-    let positionX =
-      MGameConfig.GameMeshStartPosition.x +
-      MGameConfig.GameBoxItemSize.x * gameMeshX;
-    let positionY =
-      MGameConfig.GameMeshStartPosition.y -
-      MGameConfig.GameBoxItemSize.y * gameMeshY;
+    let positionX = MGameConfig.GameMeshStartPosition.x + MGameConfig.GameBoxItemSize.x * gameMeshX;
+    let positionY = MGameConfig.GameMeshStartPosition.y - MGameConfig.GameBoxItemSize.y * gameMeshY;
     (<Laya.Sprite>this.owner).pos(positionX, positionY);
   }
 
   onDestroy() {
-    EventManager.Instance.off(
-      MCustomEvent.ClickGameBoard,
-      this,
-      this.onGameBoardClick
-    );
+    EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
   }
 
   onGameBoardClick(clickMeshX: number) {
     console.log("onGameBoardClick", clickMeshX);
     let sprite = <Laya.Sprite>this.owner;
     let offsetX = clickMeshX * 84;
-    Laya.Tween.to(
-      sprite,
-      { x: offsetX, y: -84 },
-      300,
-      Laya.Ease.linearNone,
-      Laya.Handler.create(this, this.onTweenCompelete)
-    );
+    Laya.Tween.to(sprite, { x: offsetX, y: -84 }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete));
   }
 
   onTweenCompelete() {
-    // let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
     this.owner.addComponent(Laya.RigidBody);
+    // let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
+    // rigidBody.type = 'dynamic'
+    // rigidBody.gravityScale = 1;
+    // this.owner.addComponent(Laya.RigidBody);
     // rigidBody.enabled = true;
   }
 }
