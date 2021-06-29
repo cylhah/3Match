@@ -72,15 +72,17 @@
   ClickBox.ClickBoxStartPosition = new Vector2(66, 0);
 
   class BoxItem extends Laya.Script {
-      init(type) {
+      init(type, id) {
+          this.switchTexture(id);
           if (type == 0) {
               EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
               this.posToGameBoardReadyArea();
-              let rigidBody = this.owner.getComponent(Laya.RigidBody);
           }
       }
+      switchTexture(id) {
+          this.owner.loadImage(`image/box/game_box_${id}.png`);
+      }
       posToGameBoardReadyArea() {
-          console.log("posToGameBoardReadyArea");
           this.owner.pos(252, -84);
       }
       posToGameBoard(gameMeshX, gameMeshY) {
@@ -98,7 +100,13 @@
           Laya.Tween.to(sprite, { x: offsetX, y: -84 }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete));
       }
       onTweenCompelete() {
-          this.owner.addComponent(Laya.RigidBody);
+          this.posToGameBoard(1, 3);
+      }
+  }
+
+  class Utils {
+      static random(min, max) {
+          return Math.floor(Math.random() * (max - min) + min);
       }
   }
 
@@ -106,8 +114,20 @@
       onAwake() {
           this.gameBoard = this.owner.getChildByName("GameBackground").getChildByName("GameBoard");
           this.clickContainer = this.owner.getChildByName("GameBackground").getChildByName("ClickContainer");
+          this.initGameBoardDataArray();
           this.initGameBoard();
           this.initClickBoxes();
+      }
+      initGameBoardDataArray() {
+          this.gameBoardArray = [];
+          for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
+              for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
+                  if (!this.gameBoardArray[i]) {
+                      this.gameBoardArray[i] = [];
+                  }
+                  this.gameBoardArray[i][j] = -1;
+              }
+          }
       }
       initGameBoard() {
           let InitialGameCount = MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
@@ -116,13 +136,13 @@
               let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
               let scirpt = box.getComponent(BoxItem);
-              scirpt.init(1);
+              scirpt.init(1, Utils.random(1, 10));
               scirpt.posToGameBoard(gameMeshX, gameMeshY);
               this.gameBoard.addChild(box);
           }
           let readyBox = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
           let scirpt = readyBox.getComponent(BoxItem);
-          scirpt.init(0);
+          scirpt.init(0, 1);
           this.gameBoard.addChild(readyBox);
       }
       initClickBoxes() {

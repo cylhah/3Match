@@ -9,21 +9,19 @@ export default class BoxItem extends Laya.Script {
    * 初始化
    * @param type 0: GameBoard上方即将下落的box 1: 在GameBoard里的box
    */
-  init(type: number) {
+  init(type: number, id: number) {
+    this.switchTexture(id);
     if (type == 0) {
       EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
-
       this.posToGameBoardReadyArea();
-
-      let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
-      // rigidBody.destroy()
-      // rigidBody.
-      // rigidBody.gravityScale = 0
     }
   }
 
+  private switchTexture(id: number) {
+    (<Laya.Sprite>this.owner).loadImage(`image/box/game_box_${id}.png`);
+  }
+
   posToGameBoardReadyArea() {
-    console.log("posToGameBoardReadyArea");
     (<Laya.Sprite>this.owner).pos(252, -84);
   }
 
@@ -45,11 +43,6 @@ export default class BoxItem extends Laya.Script {
   }
 
   onTweenCompelete() {
-    this.owner.addComponent(Laya.RigidBody);
-    // let rigidBody: Laya.RigidBody = this.owner.getComponent(Laya.RigidBody);
-    // rigidBody.type = 'dynamic'
-    // rigidBody.gravityScale = 1;
-    // this.owner.addComponent(Laya.RigidBody);
-    // rigidBody.enabled = true;
+    this.posToGameBoard(1, 3);
   }
 }

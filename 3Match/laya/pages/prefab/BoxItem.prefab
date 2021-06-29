@@ -3,7 +3,7 @@
     "type":"Sprite",
     "selectedBox":5,
     "searchKey":"Sprite,BoxItem",
-    "props":{"y":0,"x":0,"width":84,"texture":"image/1586f6ec-a9b0-40a2-ba9b-a3202d93b523.png","presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab","name":"BoxItem","isPresetRoot":true,"height":84},
+    "props":{"y":0,"x":0,"width":84,"texture":"image/box/game_box_1.png","presetID":1,"preset":"laya/pages/prefab/BoxItem.prefab","name":"BoxItem","isPresetRoot":true,"height":84},
     "nodeParent":-1,
     "maxID":9,
     "label":"BoxItem",
@@ -13,37 +13,6 @@
     "hasChild":true,
     "compId":5,
     "child":[
-        {
-            "type":"RigidBody",
-            "switchAble":true,
-            "searchKey":"RigidBody",
-            "removeAble":true,
-            "props":{"type":"dynamic","presetID":2,"preset":"laya/pages/prefab/BoxItem.prefab","enabled":true},
-            "nodeParent":5,
-            "label":"RigidBody(BoxItem)",
-            "isDirectory":false,
-            "isClose":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":6,
-            "child":[
-                ]
-        },
-        {
-            "type":"BoxCollider",
-            "switchAble":true,
-            "searchKey":"BoxCollider",
-            "removeAble":true,
-            "props":{"width":84,"presetID":3,"preset":"laya/pages/prefab/BoxItem.prefab","height":84},
-            "nodeParent":5,
-            "label":"BoxCollider(BoxItem)",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":7,
-            "child":[
-                ]
-        },
         {
             "type":"Script",
             "switchAble":true,
