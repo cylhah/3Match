@@ -1,48 +1,64 @@
 import { EventManager } from "./common/EventManager";
 import { MCustomEvent } from "./common/MCustomEvent";
+import { Store } from "./common/Store";
+import { Vector2 } from "./gameData/CommonData";
 import { MGameConfig } from "./gameData/Variables";
 
 export default class BoxItem extends Laya.Script {
-  private type: number;
+    private type: number;
 
-  /**
-   * 初始化
-   * @param type 0: GameBoard上方即将下落的box 1: 在GameBoard里的box
-   */
-  init(type: number, id: number) {
-    this.switchTexture(id);
-    if (type == 0) {
-      EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
-      this.posToGameBoardReadyArea();
+    /**
+     * 初始化
+     * @param type 0: GameBoard上方即将下落的box 1: 在GameBoard里的box
+     */
+    public init(type: number, id: number) {
+        this.switchTexture(id);
+        if (type == 0) {
+            EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+            this.posToGameBoardReadyArea();
+        }
     }
-  }
 
-  private switchTexture(id: number) {
-    (<Laya.Sprite>this.owner).loadImage(`image/box/game_box_${id}.png`);
-  }
+    private switchTexture(id: number) {
+        (<Laya.Sprite>this.owner).loadImage(`image/box/game_box_${id}.png`);
+    }
 
-  posToGameBoardReadyArea() {
-    (<Laya.Sprite>this.owner).pos(252, -84);
-  }
+    private posToGameBoardReadyArea() {
+        (<Laya.Sprite>this.owner).pos(252, -MGameConfig.GameBoxItemSize.x);
+    }
 
-  posToGameBoard(gameMeshX: number, gameMeshY: number) {
-    let positionX = MGameConfig.GameMeshStartPosition.x + MGameConfig.GameBoxItemSize.x * gameMeshX;
-    let positionY = MGameConfig.GameMeshStartPosition.y - MGameConfig.GameBoxItemSize.y * gameMeshY;
-    (<Laya.Sprite>this.owner).pos(positionX, positionY);
-  }
+    public posToGameBoard(gameMeshX: number, gameMeshY: number) {
+        let offset = this.transMeshXYToOffset(gameMeshX, gameMeshY);
+        (<Laya.Sprite>this.owner).pos(offset.x, offset.y);
+    }
 
-  onDestroy() {
-    EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
-  }
+    onDestroy() {
+        EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+    }
 
-  onGameBoardClick(clickMeshX: number) {
-    console.log("onGameBoardClick", clickMeshX);
-    let sprite = <Laya.Sprite>this.owner;
-    let offsetX = clickMeshX * 84;
-    Laya.Tween.to(sprite, { x: offsetX, y: -84 }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete));
-  }
+    private transMeshXYToOffset(meshX: number, meshY: number) {
+        return new Vector2(MGameConfig.GameMeshStartPosition.x + MGameConfig.GameBoxItemSize.x * meshX, MGameConfig.GameMeshStartPosition.y - MGameConfig.GameBoxItemSize.y * meshY);
+    }
 
-  onTweenCompelete() {
-    this.posToGameBoard(1, 3);
-  }
+    private onGameBoardClick(clickMeshX: number) {
+        let sprite = <Laya.Sprite>this.owner;
+        let offsetX = clickMeshX * MGameConfig.GameBoxItemSize.x;
+        Laya.Tween.to(sprite, { x: offsetX, y: -MGameConfig.GameBoxItemSize.x }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete, [clickMeshX]));
+    }
+
+    private calcDropY(dropX: number) {
+        for (let i = 0; i < Store.Instance.GameBoardArray.length; i++) {
+            let row = Store.Instance.GameBoardArray[i];
+            if (row[dropX] == -1) {
+                return i;
+            }
+        }
+    }
+
+    private onTweenCompelete(clickMeshX: number) {
+      let sprite = <Laya.Sprite>this.owner;
+        let dropY = this.calcDropY(clickMeshX);
+        let offset = this.transMeshXYToOffset(clickMeshX, dropY);
+        Laya.Tween.to(sprite, { x: offset.x, y: offset.y }, 300, Laya.Ease.linearNone);
+    }
 }
