@@ -20,29 +20,29 @@ export default class MainGame extends Laya.Script {
         this.clickContainer = <Laya.Sprite>this.owner.getChildByName("GameBackground").getChildByName("ClickContainer");
 
         this.initEventListener();
-        this.initGameBoardDataArray();
+        Store.Instance.init();
         this.initGameBoard();
         this.initClickBoxes();
     }
 
     private initEventListener() {
-      EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+        EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
+        // EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
     }
 
-    private onGameBoardClick() {
-
+    private onBoxItemDrop() {
+        this.createReadyBox();
     }
 
-    private initGameBoardDataArray() {
-        Store.Instance.GameBoardArray = [];
-        for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
-            for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
-                if (!Store.Instance.GameBoardArray[i]) {
-                  Store.Instance.GameBoardArray[i] = [];
-                }
-                Store.Instance.GameBoardArray[i][j] = -1;
-            }
-        }
+    private createReadyBox() {
+        let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
+        let scirpt: BoxItem = readyBox.getComponent(BoxItem);
+        scirpt.init(0, this.getRandomItemId());
+        this.gameBoard.addChild(readyBox);
+    }
+
+    private getRandomItemId() {
+        return Utils.random(1, 10);
     }
 
     private initGameBoard() {
@@ -53,17 +53,14 @@ export default class MainGame extends Laya.Script {
 
             let box: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
             let scirpt: BoxItem = box.getComponent(BoxItem);
-            let itemId = Utils.random(1, 10);
+            let itemId = this.getRandomItemId();
             scirpt.init(1, itemId);
             scirpt.posToGameBoard(gameMeshX, gameMeshY);
             this.gameBoard.addChild(box);
             Store.Instance.GameBoardArray[gameMeshY][gameMeshX] = itemId;
         }
 
-        let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
-        let scirpt: BoxItem = readyBox.getComponent(BoxItem);
-        scirpt.init(0, 1);
-        this.gameBoard.addChild(readyBox);
+        this.createReadyBox();
     }
 
     private initClickBoxes() {

@@ -40,6 +40,7 @@
   var MCustomEvent;
   (function (MCustomEvent) {
       MCustomEvent["ClickGameBoard"] = "ClickGameBoard";
+      MCustomEvent["BoxItemDrop"] = "BoxItemDrop";
   })(MCustomEvent || (MCustomEvent = {}));
 
   class Vector2 {
@@ -78,10 +79,25 @@
           }
           return this.instance;
       }
+      init() {
+          Store.Instance.GameBoardArray = [];
+          for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
+              for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
+                  if (!Store.Instance.GameBoardArray[i]) {
+                      Store.Instance.GameBoardArray[i] = [];
+                  }
+                  Store.Instance.GameBoardArray[i][j] = -1;
+              }
+          }
+      }
+      placeBoxItem(x, y, id) {
+          this.GameBoardArray[x][y] = id;
+      }
   }
 
   class BoxItem extends Laya.Script {
       init(type, id) {
+          this.boxId = id;
           this.switchTexture(id);
           if (type == 0) {
               EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
@@ -121,7 +137,12 @@
           let sprite = this.owner;
           let dropY = this.calcDropY(clickMeshX);
           let offset = this.transMeshXYToOffset(clickMeshX, dropY);
-          Laya.Tween.to(sprite, { x: offset.x, y: offset.y }, 300, Laya.Ease.linearNone);
+          Laya.Tween.to(sprite, { x: offset.x, y: offset.y }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onDropCompelete, [clickMeshX, dropY]));
+      }
+      onDropCompelete(meshX, meshY) {
+          Store.Instance.placeBoxItem(meshY, meshX, this.boxId);
+          EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+          EventManager.Instance.event(MCustomEvent.BoxItemDrop);
       }
   }
 
@@ -136,25 +157,24 @@
           this.gameBoard = this.owner.getChildByName("GameBackground").getChildByName("GameBoard");
           this.clickContainer = this.owner.getChildByName("GameBackground").getChildByName("ClickContainer");
           this.initEventListener();
-          this.initGameBoardDataArray();
+          Store.Instance.init();
           this.initGameBoard();
           this.initClickBoxes();
       }
       initEventListener() {
-          EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+          EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
       }
-      onGameBoardClick() {
+      onBoxItemDrop() {
+          this.createReadyBox();
       }
-      initGameBoardDataArray() {
-          Store.Instance.GameBoardArray = [];
-          for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
-              for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
-                  if (!Store.Instance.GameBoardArray[i]) {
-                      Store.Instance.GameBoardArray[i] = [];
-                  }
-                  Store.Instance.GameBoardArray[i][j] = -1;
-              }
-          }
+      createReadyBox() {
+          let readyBox = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
+          let scirpt = readyBox.getComponent(BoxItem);
+          scirpt.init(0, this.getRandomItemId());
+          this.gameBoard.addChild(readyBox);
+      }
+      getRandomItemId() {
+          return Utils.random(1, 10);
       }
       initGameBoard() {
           let InitialGameCount = MGameConfig.InitialGameMeshHeight * MGameConfig.GameMeshWidth;
@@ -163,16 +183,13 @@
               let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
               let box = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
               let scirpt = box.getComponent(BoxItem);
-              let itemId = Utils.random(1, 10);
+              let itemId = this.getRandomItemId();
               scirpt.init(1, itemId);
               scirpt.posToGameBoard(gameMeshX, gameMeshY);
               this.gameBoard.addChild(box);
               Store.Instance.GameBoardArray[gameMeshY][gameMeshX] = itemId;
           }
-          let readyBox = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
-          let scirpt = readyBox.getComponent(BoxItem);
-          scirpt.init(0, 1);
-          this.gameBoard.addChild(readyBox);
+          this.createReadyBox();
       }
       initClickBoxes() {
           for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
