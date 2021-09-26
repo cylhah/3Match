@@ -67,6 +67,6 @@ export default class BoxItem extends Laya.Script {
     private onDropCompelete(meshX: number, meshY: number) {
         Store.Instance.placeBoxItem(meshY, meshX, this.boxId);
         EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
-        EventManager.Instance.event(MCustomEvent.BoxItemDrop);
+        EventManager.Instance.event(MCustomEvent.BoxItemDrop, [meshX, meshY]);
     }
 }

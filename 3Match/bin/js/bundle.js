@@ -71,6 +71,24 @@
   }
   ClickBox.ClickBoxStartPosition = new Vector2(66, 0);
 
+  class Utils {
+      static random(min, max) {
+          return Math.floor(Math.random() * (max - min) + min);
+      }
+      static fill2DAry(l1, l2, value) {
+          let ary = [];
+          for (let i = 0; i < l1; i++) {
+              for (let j = 0; j < l2; j++) {
+                  if (!ary[i]) {
+                      ary[i] = [];
+                  }
+                  ary[i][j] = value;
+              }
+          }
+          return ary;
+      }
+  }
+
   class Store {
       constructor() { }
       static get Instance() {
@@ -80,18 +98,15 @@
           return this.instance;
       }
       init() {
-          Store.Instance.GameBoardArray = [];
-          for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
-              for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
-                  if (!Store.Instance.GameBoardArray[i]) {
-                      Store.Instance.GameBoardArray[i] = [];
-                  }
-                  Store.Instance.GameBoardArray[i][j] = -1;
-              }
-          }
+          Store.instance.GameBoardArray = Utils.fill2DAry(MGameConfig.GameMeshHeight, MGameConfig.GameMeshWidth, -1);
       }
       placeBoxItem(x, y, id) {
           this.GameBoardArray[x][y] = id;
+      }
+      getBoxItemId(meshX, meshY) {
+          if (meshY < 0 || meshY >= MGameConfig.GameMeshHeight || meshX < 0 || meshX >= MGameConfig.GameMeshWidth)
+              return null;
+          return Store.instance.GameBoardArray[meshY][meshX];
       }
   }
 
@@ -142,13 +157,7 @@
       onDropCompelete(meshX, meshY) {
           Store.Instance.placeBoxItem(meshY, meshX, this.boxId);
           EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
-          EventManager.Instance.event(MCustomEvent.BoxItemDrop);
-      }
-  }
-
-  class Utils {
-      static random(min, max) {
-          return Math.floor(Math.random() * (max - min) + min);
+          EventManager.Instance.event(MCustomEvent.BoxItemDrop, [meshX, meshY]);
       }
   }
 
@@ -161,11 +170,47 @@
           this.initGameBoard();
           this.initClickBoxes();
       }
+      onDestroy() {
+          this.removeEventListener();
+      }
       initEventListener() {
           EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
       }
-      onBoxItemDrop() {
+      removeEventListener() {
+          EventManager.Instance.off(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
+      }
+      onBoxItemDrop(meshX, meshY) {
+          console.log(meshX, meshY);
           this.createReadyBox();
+          this.handleMatch(meshX, meshY);
+      }
+      handleMatch(meshX, meshY) {
+          let GameWidth = MGameConfig.GameMeshWidth;
+          let GameHeight = MGameConfig.GameMeshHeight;
+          let queue = [];
+          let visit = Utils.fill2DAry(GameHeight, GameWidth, 0);
+          let front = 0;
+          let rear = 0;
+          let current = { x: meshX, y: meshY };
+          let targetId = Store.Instance.getBoxItemId(meshX, meshY);
+          queue[rear++] = current;
+          let matchedItemAry = [];
+          let dx = [-1, 1, 0, 0];
+          let dy = [0, 0, -1, 1];
+          visit[meshX][meshY] = 1;
+          while (rear != front) {
+              current = queue[front++];
+              matchedItemAry.push(current);
+              for (let i = 0; i < dx.length; i++) {
+                  let x = current.x + dx[i];
+                  let y = current.y + dy[i];
+                  let nextId = Store.Instance.getBoxItemId(x, y);
+                  if (x >= 0 && x < GameHeight && y >= 0 && y < GameWidth && nextId == targetId && visit[x][y] == 0) {
+                      visit[x][y] = 1;
+                      queue[rear++] = { x, y };
+                  }
+              }
+          }
       }
       createReadyBox() {
           let readyBox = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);

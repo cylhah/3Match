@@ -1,4 +1,5 @@
 import { MGameConfig } from "../gameData/Variables";
+import { Utils } from "./Utils";
 
 export class Store {
     private static instance: Store;
@@ -10,21 +11,19 @@ export class Store {
         return this.instance;
     }
 
-    public GameBoardArray: Array<Array<number>>;
+    public GameBoardArray: number[][];
 
     public init() {
-        Store.Instance.GameBoardArray = [];
-        for (let i = 0; i < MGameConfig.GameMeshHeight; i++) {
-            for (let j = 0; j < MGameConfig.GameMeshWidth; j++) {
-                if (!Store.Instance.GameBoardArray[i]) {
-                  Store.Instance.GameBoardArray[i] = [];
-                }
-                Store.Instance.GameBoardArray[i][j] = -1;
-            }
-        }
+        Store.instance.GameBoardArray = Utils.fill2DAry(MGameConfig.GameMeshHeight, MGameConfig.GameMeshWidth, -1);
     }
 
     public placeBoxItem(x: number, y: number, id: number) {
         this.GameBoardArray[x][y] = id;
+    }
+
+    public getBoxItemId(meshX: number, meshY: number) {
+        if (meshY < 0 || meshY >= MGameConfig.GameMeshHeight || meshX < 0 || meshX >= MGameConfig.GameMeshWidth) return null;
+
+        return Store.instance.GameBoardArray[meshY][meshX];
     }
 }

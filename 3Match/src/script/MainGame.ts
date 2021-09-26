@@ -25,13 +25,53 @@ export default class MainGame extends Laya.Script {
         this.initClickBoxes();
     }
 
-    private initEventListener() {
-        EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
-        // EventManager.Instance.on(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+    onDestroy() {
+        this.removeEventListener();
     }
 
-    private onBoxItemDrop() {
+    private initEventListener() {
+        EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
+    }
+
+    private removeEventListener() {
+        EventManager.Instance.off(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
+    }
+
+    private onBoxItemDrop(meshX: number, meshY: number) {
+        console.log(meshX, meshY);
         this.createReadyBox();
+        this.handleMatch(meshX, meshY);
+    }
+
+    private handleMatch(meshX: number, meshY: number) {
+        let GameWidth = MGameConfig.GameMeshWidth;
+        let GameHeight = MGameConfig.GameMeshHeight;
+
+        let queue = [];
+        let visit = Utils.fill2DAry(GameHeight, GameWidth, 0);
+        let front = 0;
+        let rear = 0;
+        let current = { x: meshX, y: meshY };
+        let targetId = Store.Instance.getBoxItemId(meshX, meshY);
+        queue[rear++] = current;
+        let matchedItemAry = [];
+        let dx = [-1, 1, 0, 0];
+        let dy = [0, 0, -1, 1];
+
+        visit[meshX][meshY] = 1;
+        while (rear != front) {
+            current = queue[front++];
+            matchedItemAry.push(current);
+            for (let i = 0; i < dx.length; i++) {
+                let x = current.x + dx[i];
+                let y = current.y + dy[i];
+                let nextId = Store.Instance.getBoxItemId(x, y);
+                if (x >= 0 && x < GameHeight && y >= 0 && y < GameWidth && nextId == targetId && visit[x][y] == 0) {
+                    visit[x][y] = 1;
+                    queue[rear++] = { x, y };
+                }
+            }
+        }
     }
 
     private createReadyBox() {
