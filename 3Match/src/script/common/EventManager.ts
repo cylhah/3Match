@@ -1,52 +1,47 @@
 export class EventManager {
-  private static inst: EventManager;
-  private eventDispatcher: Laya.EventDispatcher;
-  private constructor() {
-    this.eventDispatcher = new Laya.EventDispatcher();
-  }
-
-  public static get Instance() {
-    if (!this.inst) {
-      this.inst = new EventManager();
+    private static inst: EventManager;
+    private eventDispatcher: Laya.EventDispatcher;
+    private constructor() {
+        this.eventDispatcher = new Laya.EventDispatcher();
     }
 
-    return this.inst;
-  }
+    public static get Instance() {
+        if (!this.inst) {
+            this.inst = new EventManager();
+        }
 
-  public hasListener(type: string) {
-    return this.eventDispatcher.hasListener(type);
-  }
+        return this.inst;
+    }
 
-  public event(type: string, data?: any) {
-    return this.eventDispatcher.event(type, data);
-  }
+    public hasListener(type: string) {
+        return this.eventDispatcher.hasListener(type);
+    }
 
-  public on(type: string, caller: any, listener: Function, arg?: any[]) {
-    return this.eventDispatcher.on(type, caller, listener, arg);
-  }
+    public event(type: string, data?: any) {
+        return this.eventDispatcher.event(type, data);
+    }
 
-  public once(type: string, caller: any, listener: Function, args?: any[]) {
-    return this.eventDispatcher.once(type, caller, listener, args);
-  }
+    public on(type: string, caller: any, listener: Function, arg?: any[]) {
+        return this.eventDispatcher.on(type, caller, listener, arg);
+    }
 
-  public off(
-    type: string,
-    caller: any,
-    listener: Function,
-    onceOnly?: boolean
-  ) {
-    return this.eventDispatcher.off(type, caller, listener, onceOnly);
-  }
+    public once(type: string, caller: any, listener: Function, args?: any[]) {
+        return this.eventDispatcher.once(type, caller, listener, args);
+    }
 
-  public offAll(type?: string) {
-    return this.eventDispatcher.offAll(type);
-  }
+    public off(type: string, caller: any, listener: Function, onceOnly?: boolean) {
+        return this.eventDispatcher.off(type, caller, listener, onceOnly);
+    }
 
-  public offAllCaller(caller: any) {
-    return this.eventDispatcher.offAllCaller(caller);
-  }
+    public offAll(type?: string) {
+        return this.eventDispatcher.offAll(type);
+    }
 
-  public isMouseEvent(type: string) {
-    return this.eventDispatcher.isMouseEvent(type);
-  }
+    public offAllCaller(caller: any) {
+        return this.eventDispatcher.offAllCaller(caller);
+    }
+
+    public isMouseEvent(type: string) {
+        return this.eventDispatcher.isMouseEvent(type);
+    }
 }

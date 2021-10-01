@@ -1,3 +1,4 @@
+import BoxItem from "../BoxItem";
 import { MGameConfig } from "../gameData/Variables";
 import { Utils } from "./Utils";
 
@@ -11,19 +12,28 @@ export class Store {
         return this.instance;
     }
 
-    public GameBoardArray: number[][];
+    public GameBoardArray: BoxItem[][];
 
     public init() {
-        Store.instance.GameBoardArray = Utils.fill2DAry(MGameConfig.GameMeshHeight, MGameConfig.GameMeshWidth, -1);
+        this.GameBoardArray = Utils.fill2DAry(MGameConfig.GameMeshHeight, MGameConfig.GameMeshWidth, null);
     }
 
-    public placeBoxItem(x: number, y: number, id: number) {
-        this.GameBoardArray[x][y] = id;
+    public placeBoxItem(x: number, y: number, item: BoxItem) {
+        this.GameBoardArray[x][y] = item;
     }
 
     public getBoxItemId(meshX: number, meshY: number) {
         if (meshY < 0 || meshY >= MGameConfig.GameMeshHeight || meshX < 0 || meshX >= MGameConfig.GameMeshWidth) return null;
+        let item = this.GameBoardArray[meshY][meshX];
+        return item ? item.boxId : null;
+    }
 
-        return Store.instance.GameBoardArray[meshY][meshX];
+    public calcDropY(dropX: number) {
+        for (let i = 0; i < this.GameBoardArray.length; i++) {
+            let row = this.GameBoardArray[i];
+            if (row[dropX] == null) {
+                return i;
+            }
+        }
     }
 }

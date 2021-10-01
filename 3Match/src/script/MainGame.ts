@@ -5,6 +5,7 @@ import { Utils } from "./common/Utils";
 import { EventManager } from "./common/EventManager";
 import { MCustomEvent } from "./common/MCustomEvent";
 import { Store } from "./common/Store";
+import ReadyBox from "./ReadyBox";
 
 export default class MainGame extends Laya.Script {
     /** @prop {name:GameBoxItem,tips:"游戏方块",type:Prefab}*/
@@ -38,7 +39,6 @@ export default class MainGame extends Laya.Script {
     }
 
     private onBoxItemDrop(meshX: number, meshY: number) {
-        console.log(meshX, meshY);
         this.createReadyBox();
         this.handleMatch(meshX, meshY);
     }
@@ -72,12 +72,26 @@ export default class MainGame extends Laya.Script {
                 }
             }
         }
+
+        if (matchedItemAry.length >= 3) {
+            for (let i = 0; i < matchedItemAry.length; i++) {
+                let x = matchedItemAry[i].x;
+                let y = matchedItemAry[i].y;
+                let item = Store.Instance.GameBoardArray[y][x];
+                item.destroyBoxItem();
+                Store.Instance.placeBoxItem(y, x, null);
+            }
+
+            EventManager.Instance.event(MCustomEvent.CorrectCurrentBox);
+        }
     }
 
     private createReadyBox() {
         let readyBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
-        let scirpt: BoxItem = readyBox.getComponent(BoxItem);
-        scirpt.init(0, this.getRandomItemId());
+        let boxItem: BoxItem = readyBox.getComponent(BoxItem);
+        boxItem.init(this.getRandomItemId());
+        let readyBoxScript: ReadyBox = readyBox.addComponent(ReadyBox);
+        readyBoxScript.posToGameBoardReadyArea();
         this.gameBoard.addChild(readyBox);
     }
 
@@ -94,10 +108,10 @@ export default class MainGame extends Laya.Script {
             let box: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
             let scirpt: BoxItem = box.getComponent(BoxItem);
             let itemId = this.getRandomItemId();
-            scirpt.init(1, itemId);
+            scirpt.init(itemId);
             scirpt.posToGameBoard(gameMeshX, gameMeshY);
             this.gameBoard.addChild(box);
-            Store.Instance.GameBoardArray[gameMeshY][gameMeshX] = itemId;
+            Store.Instance.GameBoardArray[gameMeshY][gameMeshX] = scirpt;
         }
 
         this.createReadyBox();

@@ -1,4 +1,5 @@
 export enum MCustomEvent {
-  ClickGameBoard = "ClickGameBoard",
-  BoxItemDrop = "BoxItemDrop"
+    ClickGameBoard = "ClickGameBoard",
+    BoxItemDrop = "BoxItemDrop",
+    CorrectCurrentBox = "CorrectCurrentBox",
 }
