@@ -18,8 +18,8 @@ export class Store {
         this.GameBoardArray = Utils.fill2DAry(MGameConfig.GameMeshHeight, MGameConfig.GameMeshWidth, null);
     }
 
-    public placeBoxItem(x: number, y: number, item: BoxItem) {
-        this.GameBoardArray[x][y] = item;
+    public placeBoxItem(meshX: number, meshY: number, item: BoxItem) {
+        this.GameBoardArray[meshY][meshX] = item;
     }
 
     public getBoxItemId(meshX: number, meshY: number) {

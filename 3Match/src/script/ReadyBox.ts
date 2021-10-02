@@ -12,6 +12,7 @@ export default class ReadyBox extends Laya.Script {
 
     onDestroy() {
         EventManager.Instance.off(MCustomEvent.ClickGameBoard, this, this.onGameBoardClick);
+        EventManager.Instance.event(MCustomEvent.CreateNewReadyBox);
     }
 
     private onGameBoardClick(clickMeshX: number) {
@@ -26,13 +27,14 @@ export default class ReadyBox extends Laya.Script {
         let offset = this.transMeshXYToOffset(clickMeshX, dropY);
         Laya.Tween.to(sprite, { x: offset.x, y: offset.y }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onDropCompelete, [clickMeshX, dropY]));
     }
+
     private transMeshXYToOffset(meshX: number, meshY: number) {
         return new Vector2(MGameConfig.GameMeshStartPosition.x + MGameConfig.GameBoxItemSize.x * meshX, MGameConfig.GameMeshStartPosition.y - MGameConfig.GameBoxItemSize.y * meshY);
     }
 
     private onDropCompelete(meshX: number, meshY: number) {
         let boxItemScript: BoxItem = this.owner.getComponent(BoxItem);
-        Store.Instance.placeBoxItem(meshY, meshX, boxItemScript);
+        Store.Instance.placeBoxItem(meshX, meshY, boxItemScript);
         boxItemScript.updateSelfXYData(meshX, meshY);
         EventManager.Instance.event(MCustomEvent.BoxItemDrop, [meshX, meshY]);
         this.destroy();

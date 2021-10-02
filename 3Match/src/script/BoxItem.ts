@@ -1,20 +1,18 @@
-import { EventManager } from "./common/EventManager";
-import { MCustomEvent } from "./common/MCustomEvent";
 import { Store } from "./common/Store";
 import { Vector2 } from "./gameData/CommonData";
 import { MGameConfig } from "./gameData/Variables";
 
 export default class BoxItem extends Laya.Script {
     public boxId: number;
-    private meshX: number;
-    private meshY: number;
+    private meshX: number = -1;
+    private meshY: number = -1;
 
     public init(id: number) {
         this.boxId = id;
-        this.switchTexture(id);
+        this.switchTargetImage(id);
     }
 
-    private switchTexture(id: number) {
+    private switchTargetImage(id: number) {
         (<Laya.Sprite>this.owner).loadImage(`image/box/game_box_${id}.png`);
     }
 
@@ -29,16 +27,28 @@ export default class BoxItem extends Laya.Script {
         this.updateSelfXYData(gameMeshX, gameMeshY);
     }
 
-    onAwake() {
-        EventManager.Instance.on(MCustomEvent.CorrectCurrentBox, this, this.onCorrectCurrentBox);
-    }
+    public currectBox() {
+        let downStep = 0;
+        for (let i = this.meshY - 1; i >= 0; i--) {
+            let downItem = Store.Instance.GameBoardArray[i][this.meshX];
+            if (!downItem) {
+                downStep++;
+            }
+        }
 
-    onDestroy() {
-        EventManager.Instance.off(MCustomEvent.CorrectCurrentBox, this, this.onCorrectCurrentBox);
-    }
+        if (downStep > 0) {
+            let newY = this.meshY - downStep;
+            let item = Store.Instance.GameBoardArray[this.meshY][this.meshX];
+            if (item == this) {
+                Store.Instance.placeBoxItem(this.meshX, this.meshY, null);
+            }
+            this.posToGameBoard(this.meshX, newY);
+            Store.Instance.placeBoxItem(this.meshX, this.meshY, this);
 
-    private onCorrectCurrentBox() {
-        console.log("onCorrectCurrentBox", Store.Instance.GameBoardArray, this.meshX, this.meshY);
+            return this;
+        } else {
+            return null;
+        }
     }
 
     public destroyBoxItem() {
