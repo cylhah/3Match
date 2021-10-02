@@ -1,1 +1,0 @@
-{"type":"Sprite","props":{"y":0,"x":0,"width":84,"texture":"image/box/game_box_1.png","presetID":1,"name":"BoxItem","isPresetRoot":true,"height":84},"compId":5,"child":[{"type":"Script","props":{"presetID":4,"runtime":"script/BoxItem.ts"},"compId":8}],"loadList":["image/box/game_box_1.png"],"loadList3D":[]}

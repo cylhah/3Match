@@ -1,1 +1,0 @@
-{"type":"Sprite","props":{"x":0,"y":0,"name":"Ground","width":720,"height":20,"presetID":1,"isPresetRoot":true},"compId":20,"child":[{"type":"Script","props":{"type":"static","presetID":2,"runtime":"Laya.RigidBody"},"compId":21},{"type":"Script","props":{"width":720,"height":20,"presetID":3,"runtime":"Laya.BoxCollider"},"compId":22}],"loadList":[],"loadList3D":[]}
