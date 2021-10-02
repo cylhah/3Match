@@ -31,13 +31,19 @@ export default class MainGame extends Laya.Script {
     }
 
     private initEventListener() {
+        EventManager.Instance.on(MCustomEvent.GameEnd, this, this.onGameEnd);
         EventManager.Instance.on(MCustomEvent.CreateNewReadyBox, this, this.createReadyBox);
         EventManager.Instance.on(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
     }
 
     private removeEventListener() {
+        EventManager.Instance.off(MCustomEvent.GameEnd, this, this.onGameEnd);
         EventManager.Instance.off(MCustomEvent.CreateNewReadyBox, this, this.createReadyBox);
         EventManager.Instance.off(MCustomEvent.BoxItemDrop, this, this.onBoxItemDrop);
+    }
+
+    private onGameEnd() {
+        console.log("onGameEnd");
     }
 
     private onBoxItemDrop(meshX: number, meshY: number) {
@@ -57,7 +63,7 @@ export default class MainGame extends Laya.Script {
         let matchedItemAry = [];
         let dx = [-1, 1, 0, 0];
         let dy = [0, 0, -1, 1];
-        visit[meshX][meshY] = 1;
+        visit[meshY][meshX] = 1;
         while (rear != front) {
             current = queue[front++];
             matchedItemAry.push(current);
@@ -65,8 +71,8 @@ export default class MainGame extends Laya.Script {
                 let x = current.x + dx[i];
                 let y = current.y + dy[i];
                 let nextId = Store.Instance.getBoxItemId(x, y);
-                if (x >= 0 && x < GameHeight && y >= 0 && y < GameWidth && nextId == targetId && visit[x][y] == 0) {
-                    visit[x][y] = 1;
+                if (x >= 0 && x < GameWidth && y >= 0 && y < GameHeight && nextId == targetId && visit[y][x] == 0) {
+                    visit[y][x] = 1;
                     queue[rear++] = { x, y };
                 }
             }
@@ -132,7 +138,7 @@ export default class MainGame extends Laya.Script {
             let gameMeshX = i % MGameConfig.GameMeshWidth;
             let gameMeshY = Math.floor(i / MGameConfig.GameMeshWidth);
 
-            let box: Laya.Sprite = Laya.Pool.getItemByCreateFun("GameBoxItem", this.GameBoxItem.create, this.GameBoxItem);
+            let box: Laya.Sprite = this.GameBoxItem.create();
             let scirpt: BoxItem = box.getComponent(BoxItem);
             let itemId = this.getRandomItemId();
             scirpt.init(itemId);
@@ -146,7 +152,7 @@ export default class MainGame extends Laya.Script {
 
     private initClickBoxes() {
         for (let i = 0; i < MGameConfig.GameMeshWidth; i++) {
-            let clickBox: Laya.Sprite = Laya.Pool.getItemByCreateFun("ClickBox", this.ClickBox.create, this.ClickBox);
+            let clickBox: Laya.Sprite = this.ClickBox.create();
 
             let script: ClickBox = clickBox.getComponent(ClickBox);
             script.init(i);

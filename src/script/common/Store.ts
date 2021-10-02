@@ -35,5 +35,7 @@ export class Store {
                 return i;
             }
         }
+
+        return null;
     }
 }

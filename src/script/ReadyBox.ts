@@ -16,9 +16,19 @@ export default class ReadyBox extends Laya.Script {
     }
 
     private onGameBoardClick(clickMeshX: number) {
+        if (this.checkGameEnd(clickMeshX)) {
+            EventManager.Instance.event(MCustomEvent.GameEnd);
+            return;
+        }
+
         let sprite = <Laya.Sprite>this.owner;
         let offsetX = clickMeshX * MGameConfig.GameBoxItemSize.x;
         Laya.Tween.to(sprite, { x: offsetX, y: -MGameConfig.GameBoxItemSize.x }, 300, Laya.Ease.linearNone, Laya.Handler.create(this, this.onTweenCompelete, [clickMeshX]));
+    }
+
+    private checkGameEnd(clickMeshX: number) {
+        let dropY = Store.Instance.calcDropY(clickMeshX);
+        return dropY == null;
     }
 
     private onTweenCompelete(clickMeshX: number) {
