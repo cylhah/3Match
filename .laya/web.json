@@ -29,9 +29,9 @@
     "version": false,
     "versionFilter": [
         "$basePath/**/*.*",
-        "!$basePath/*.html",
         "!$basePath/{version.json,game.js,game.json,project.config.json,weapp-adapter.js,project.swan.json,swan-game-adapter.js,main.js,gameConfig.json,my-adapter.js,microgame-adapter.js,qg-adapter.js,huawei-adapter.js,adapter.js,}",
-        "!$basePath/layaforqq/**/*.*"
+        "!$basePath/layaforqq/**/*.*",
+        "!$basePath/**/*.html"
     ],
     "versionNoteList": [
         "",
@@ -65,5 +65,5 @@
     "useMinJsLibs": true,
     "es6toes5": false,
     "projectType": "ts",
-    "pubTime": 1623397978867
+    "pubTime": 1633226563637
 }
