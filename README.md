@@ -6,3 +6,7 @@
 
 -   node: 11.15.0
 -   LayaAirIED: 2.11.0
+
+## 体验地址
+
+https://cylhah.github.io/games/3Match/
